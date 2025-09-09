@@ -23,34 +23,34 @@
   "types": "./dist/index.d.ts",
   "exports": {
     "./default-request-interceptor": {
+      "types": "./dist/default-request-interceptor/index.d.ts",
       "import": "./dist/default-request-interceptor.js",
-      "require": "./dist/default-request-interceptor.js",
-      "types": "./dist/default-request-interceptor/index.d.ts"
+      "require": "./dist/default-request-interceptor.js"
     },
     "./default-response-interceptor": {
+      "types": "./dist/default-response-interceptor/index.d.ts",
       "import": "./dist/default-response-interceptor.js",
-      "require": "./dist/default-response-interceptor.js",
-      "types": "./dist/default-response-interceptor/index.d.ts"
+      "require": "./dist/default-response-interceptor.js"
     },
     "./error-message-interceptor": {
+      "types": "./dist/error-message-interceptor/index.d.ts",
       "import": "./dist/error-message-interceptor.js",
-      "require": "./dist/error-message-interceptor.js",
-      "types": "./dist/error-message-interceptor/index.d.ts"
+      "require": "./dist/error-message-interceptor.js"
     },
     "./authenticate-interceptor": {
+      "types": "./dist/authenticate-interceptor/index.d.ts",
       "import": "./dist/authenticate-interceptor.js",
-      "require": "./dist/authenticate-interceptor.js",
-      "types": "./dist/authenticate-interceptor/index.d.ts"
+      "require": "./dist/authenticate-interceptor.js"
     },
     "./utils": {
+      "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils.js",
-      "require": "./dist/utils.js",
-      "types": "./dist/utils/index.d.ts"
+      "require": "./dist/utils.js"
     },
     "./openapi-ts-request-util": {
+      "types": "./dist/openapi-ts-request-util/index.d.ts",
       "import": "./dist/openapi-ts-request-util.js",
-      "require": "./dist/openapi-ts-request-util.js",
-      "types": "./dist/openapi-ts-request-util/index.d.ts"
+      "require": "./dist/openapi-ts-request-util.js"
     }
   },
   "publishConfig": {
