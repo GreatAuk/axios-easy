@@ -13,13 +13,6 @@ type Response = {
   errorCodeDes?: string;
 }
 
-function makeResponseSuccess<T = any>(data: T) {
-  return {
-    resultCode: 'SUCCESS',
-    data,
-  };
-}
-
 function makeResponseError(message: string, errorCode: string) {
   return {
     resultCode: 'FAIL',
@@ -47,28 +40,26 @@ describe('组合使用拦截器', () => {
     const mockDialog = vi.fn();
 
     interceptorIds.push(
-      ...[
-        createDefaultResponseInterceptor(axiosInstance, {
-          codeField: 'resultCode',
-          dataField: 'data',
-          successCode: 'SUCCESS',
-          isThrowWhenFail: true,
-        }),
-        createErrorMessageInterceptor(axiosInstance, (error: AxiosResponse<Response, any>, errMsg) => {
-          const { data, config } = error;
-          if (config?.errorMessageMode === 'none') {
-            return;
-          }
+      createDefaultResponseInterceptor(axiosInstance, {
+        codeField: 'resultCode',
+        dataField: 'data',
+        successCode: 'SUCCESS',
+        isThrowWhenFail: true,
+      }),
+      createErrorMessageInterceptor(axiosInstance, (error: AxiosResponse<Response, any>, errMsg) => {
+        const { data, config } = error;
+        if (config?.errorMessageMode === 'none') {
+          return;
+        }
 
-          const errorMessage = data?.errorCodeDes || errMsg || data?.errorCode
+        const errorMessage = data?.errorCodeDes || errMsg || data?.errorCode
 
-          if (config?.errorMessageMode === 'message') {
-            mockMessage(errorMessage);
-          } else if (config?.errorMessageMode === 'modal') {
-            mockDialog(errorMessage);
-          }
-        })
-      ]
+        if (config?.errorMessageMode === 'message') {
+          mockMessage(errorMessage);
+        } else if (config?.errorMessageMode === 'modal') {
+          mockDialog(errorMessage);
+        }
+      })
     )
 
     const errorMessage = 'Pet not found';
