@@ -1,14 +1,17 @@
 # axios-easy
 
 <p align="center">
-    <a href="https://www.npmjs.com/package/axios-easy" target="__blank">
-      <img src="https://img.shields.io/npm/v/axios-easy.svg?style=flat-square&colorB=51C838" alt="NPM Version" />
-    </a>
-    <!-- <a href="https://www.npmjs.com/package/@plugin-web-update-notification/core" target="__blank"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/@plugin-web-update-notification/core?color=50a36f&label="></a> -->
-    <a href="https://github.com/GreatAuk/axios-easy/blob/main/LICENSE">
-      <img src="https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square" alt="License" />
-    </a>
-    <br>
+  <a href="https://codecov.io/gh/GreatAuk/axios-easy" >
+  <img src="https://codecov.io/gh/GreatAuk/axios-easy/graph/badge.svg?token=2RNDS9CPFU"/>
+  </a>
+  <a href="https://www.npmjs.com/package/axios-easy" target="__blank">
+    <img src="https://img.shields.io/npm/v/axios-easy.svg?style=flat-square&colorB=51C838" alt="NPM Version" />
+  </a>
+  <!-- <a href="https://www.npmjs.com/package/@plugin-web-update-notification/core" target="__blank"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/@plugin-web-update-notification/core?color=50a36f&label="></a> -->
+  <a href="https://github.com/GreatAuk/axios-easy/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square" alt="License" />
+  </a>
+  <br>
 </p>
 
 `axios-easy` 是一个为 [axios](https://axios-http.com/) 设计的轻量级工具函数库。它通过提供一系列即插即用的 `axios` 拦截器(没有其他黑科技)，帮助你优雅地处理请求和响应的通用逻辑，让你的代码更整洁、更易于维护。
