@@ -1,7 +1,7 @@
 # simple-axios
 
 [![npm version](https://img.shields.io/npm/v/simple-axios.svg)](https://www.npmjs.com/package/simple-axios)
-[![license](https://img.shields.io/npm/l/simple-axios.svg)](https://github.com/your-username/simple-axios/blob/main/LICENSE)
+[![license](https://img.shields.io/npm/l/simple-axios.svg)](https://github.com/GreatAuk/simple-axios/blob/main/LICENSE)
 
 `simple-axios` 是一个为 [axios](https://axios-http.com/) 设计的轻量级工具函数库。它通过提供一系列即插即用的 `axios` 拦截器(没有其他黑科技)，帮助你优雅地处理请求和响应的通用逻辑，让你的代码更整洁、更易于维护。
 
@@ -209,6 +209,19 @@ async function getUserInfo() {
 **功能**:
 - **下载场景下延长 timeout**: 当检测到请求是用于下载文件时（`responseType` 为 `'blob'` 或 `'arraybuffer'`），会自动延长该请求的超时时间（默认为基础超时时间的 10 倍），防止因文件过大导致下载超时。
 
+**配置选项 (`DefaultRequestInterceptorOptions`)**:
+
+```ts
+export type DefaultRequestInterceptorOptions = {
+  /**
+   * 当请求是下载文件时（`responseType` 为 `'blob'` 或 `'arraybuffer'`），
+   * 是否自动延长请求的超时时间，以防止因文件过大导致下载超时。
+   * @default true
+   */
+  extendTimeoutWhenDownload?: boolean;
+};
+```
+
 **使用**:
 ```ts
 import { createDefaultRequestInterceptor } from 'simple-axios/default-request-interceptor';
@@ -233,10 +246,33 @@ createDefaultRequestInterceptor(axiosInstance, {
     - `'data'`: 返回响应体中的核心数据字段 `response.data[dataField]`。
 
 **配置选项 (`DefaultResponseInterceptorOptions`)**:
-- `codeField` (string): 代表业务状态码的字段名，默认为 `'code'`。
-- `dataField` (string | Function): 代表核心数据的字段名，默认为 `'data'`。
-- `successCode` (string | number | Function): 定义业务成功的状态码值，默认为 `0`。
-- `isThrowWhenFail` (boolean): 当业务失败时是否抛出错误，默认为 `true`。
+
+```ts
+export type DefaultResponseInterceptorOptions = {
+  /**
+   * 响应数据中代表业务状态码的字段名。
+   * @default 'code'
+   */
+  codeField: string;
+  /**
+   * 响应数据中代表核心业务数据的字段名，或一个函数，用于从响应体中提取数据。
+   * @default 'data'
+   */
+  dataField: ((response: any) => any) | string;
+  /**
+   * 定义业务成功的状态码值。
+   * 可以是一个具体的值，或一个函数，返回 `true` 表示成功。
+   * @default 0
+   */
+  successCode: ((code: any) => boolean) | number | string;
+  /**
+   * 当业务请求失败时（状态码不匹配 `successCode`），是否抛出错误。
+   * 设置为 `true` 后，业务错误将进入 `catch` 块，可由错误拦截器统一处理。
+   * @default true
+   */
+  isThrowWhenFail?: boolean;
+};
+```
 
 **使用**:
 ```ts
@@ -327,13 +363,22 @@ export function isServerError(error: any): error is ServerError {
 - **标准化错误信息**: 将网络错误、超时、HTTP 错误（4xx, 5xx）等转化为用户易于理解的提示信息。
 - **自定义处理**: 你需要提供一个处理函数，来自定义如何显示错误信息（例如使用 `Message` 或 `Modal` 组件）。
 
+**回调函数类型 (`HandleErrorMessage`)**:
+
+```ts
+/**
+ * @param error Axios 响应对象，其中包含了完整的错误信息。
+ * @param networkErrMsg networkErrMsg 是拦截器生成的标准化错误信息 在服务器返回4xx或5xx状态码，无法连接到服务器或CORS错误，请求超时的情况(axios 内部错误)，才有预置的错误信息。
+ */
+export type HandleErrorMessage = (error: AxiosResponse<any, any>, networkErrMsg: string) => void;
+```
+
 **使用**:
 你需要传入一个回调函数，该函数接收两个参数：`error` (Axios 响应对象) 和 `networkErrMsg` (拦截器生成的标准化错误信息)。
 
 ```ts
 import { createErrorMessageInterceptor } from 'simple-axios/error-message-interceptor';
 
-// networkErrMsg 是拦截器生成的标准化错误信息 在服务器返回4xx或5xx状态码，无法连接到服务器或CORS错误，请求超时的情况(axios 内部错误)，才有预置的错误信息。
 createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
   // 优先使用后端返回的错误描述
   const errorMessage = error.data?.errorCodeDes || networkErrMsg || '未知错误';
@@ -366,10 +411,34 @@ createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
     4. 如果刷新失败，则执行 `doReAuthenticate`。
 
 **配置选项 (`AuthenticateInterceptorOptions`)**:
-- `isAuthenticateFailed` (Function): 一个函数，用于判断当前错误是否为认证失败。
-- `doReAuthenticate` (Function): 认证失败且无法恢复（或刷新失败）后执行的操作。
-- `enableRefreshToken` (boolean): 是否启用 Token 刷新功能。
-- `doRefreshToken` (Function): 一个异步函数，用于执行刷新 Token 的具体逻辑。
+
+```ts
+export type AuthenticateInterceptorOptions = {
+  /**
+   * 判断当前错误是否为认证失败。
+   * @param error Axios 错误对象。
+   * @returns 如果是认证失败，则返回 `true`。
+   */
+  isAuthenticateFailed: (error: AxiosError) => boolean;
+  /**
+   * 认证失败且无法恢复（或刷新 Token 失败）后执行的操作。
+   * 通常用于跳转到登录页。
+   * @param error Axios 错误对象。
+   */
+  doReAuthenticate: (error: AxiosError) => Promise<void>;
+  /**
+   * 是否启用 Token 自动刷新功能。
+   * @default false
+   */
+  enableRefreshToken: boolean;
+  /**
+   * 一个异步函数，用于执行刷新 Token 的具体逻辑。
+   * 如果刷新成功，函数应正常返回；如果失败，则应抛出异常，以便触发 `doReAuthenticate`。
+   * @param error Axios 错误对象。
+   */
+  doRefreshToken: (error: AxiosError) => Promise<any>;
+};
+```
 
 **使用**:
 ```ts
@@ -401,6 +470,23 @@ createAuthenticateInterceptor(axiosInstance, {
 
 - **如果成功 (文件流)**: 自动从 `content-disposition` 头获取文件名，并调用 [`file-saver`](https://github.com/eligrey/FileSaver.js) 库的 `saveAs` 触发浏览器下载（比简单的通过 a 标签下载兼容性更好）。
 - **如果失败 (JSON)**: 解析 JSON 中的错误信息并返回。
+
+**配置选项 (`ProcessFileStreamOptions`)**:
+
+```ts
+export type ProcessFileStreamOptions = {
+  /**
+   * 自定义文件名。
+   * 如果提供此选项，将优先使用该文件名，而不是从 `content-disposition` 头中解析。
+   */
+  fileName?: string;
+  /**
+   * 当响应体是 JSON 格式的错误信息时，用于提取错误文本的字段名。
+   * @default 'errorCodeDes'
+   */
+  errorMessageField?: string;
+};
+```
 
 **使用**:
 ```ts
