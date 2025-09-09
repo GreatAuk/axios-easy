@@ -61,7 +61,7 @@
     "dev": "tsdown --watch",
     "test": "vitest",
     "typecheck": "tsc --noEmit",
-    "release": "bumpp && npm publish",
+    "release": "bumpp",
     "lint": "oxlint --fix"
   },
   "devDependencies": {
