@@ -46,6 +46,11 @@
       "import": "./dist/utils.js",
       "require": "./dist/utils.js",
       "types": "./dist/utils/index.d.ts"
+    },
+    "./openapi-ts-request-util": {
+      "import": "./dist/openapi-ts-request-util.js",
+      "require": "./dist/openapi-ts-request-util.js",
+      "types": "./dist/openapi-ts-request-util/index.d.ts"
     }
   },
   "publishConfig": {

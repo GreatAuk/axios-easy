@@ -9,6 +9,7 @@ export default defineConfig([
       'error-message-interceptor': './src/error-message-interceptor/index.ts',
       'authenticate-interceptor': './src/authenticate-interceptor/index.ts',
       'utils': "./src/utils/index.ts",
+      'openapi-ts-request-util': './src/openapi-ts-request-util.ts',
     },
     platform: 'neutral',
     dts: true,
