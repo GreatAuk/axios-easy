@@ -202,7 +202,7 @@ async function getUserInfo() {
 
 ## 📚 API 文档
 
-### `simple-axios/default-request-interceptor`
+### `simple-axios/default-request-interceptor` [source](https://github.com/GreatAuk/simple-axios/blob/main/src/default-request-interceptor/index.ts)
 
 此拦截器用于优化请求行为。
 
@@ -233,7 +233,7 @@ createDefaultRequestInterceptor(axiosInstance, {
 
 ---
 
-### `simple-axios/default-response-interceptor`
+### `simple-axios/default-response-interceptor` [source](https://github.com/GreatAuk/simple-axios/blob/main/src/default-response-interceptor/index.ts)
 
 此拦截器用于标准化响应数据结构，让你在业务代码中只关心核心数据。
 
@@ -355,7 +355,7 @@ export function isServerError(error: any): error is ServerError {
 ```
 ---
 
-### `simple-axios/error-message-interceptor`
+### `simple-axios/error-message-interceptor` [source](https://github.com/GreatAuk/simple-axios/blob/main/src/error-message-interceptor/index.ts)
 
 此拦截器用于统一捕获和处理所有请求错误，并提供友好的错误提示。
 
@@ -398,7 +398,7 @@ createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
 
 ---
 
-### `simple-axios/authenticate-interceptor`
+### `simple-axios/authenticate-interceptor` [source](https://github.com/GreatAuk/simple-axios/blob/main/src/authenticate-interceptor/index.ts)
 
 这是一个认证处理拦截器，专门用于处理登录状态失效（如 401）和 Token 自动续期。
 
@@ -464,7 +464,7 @@ createAuthenticateInterceptor(axiosInstance, {
 
 提供一些在网络请求中非常实用的辅助函数。
 
-**`processFileStream(response, options)`**
+**`processFileStream(response, options)`** [source](https://github.com/GreatAuk/simple-axios/blob/main/src/utils/processFileStream.ts)
 
 处理文件下载流的核心函数。它能智能判断响应是文件流还是包含错误信息的 JSON。
 
@@ -514,7 +514,7 @@ async function handleExport() {
 }
 ```
 
-**`getFilenameFromContentDisposition`**
+**`getFilenameFromContentDisposition`** [source](https://github.com/GreatAuk/simple-axios/blob/main/src/utils/getFilenameFromContentDisposition.ts)
 
 从 `content-disposition` 响应头中安全地解析出文件名。支持 filename*=(RFC-5987) 和 filename= 格式。
 
@@ -538,7 +538,7 @@ console.log(`Header 4: ${getFilenameFromContentDisposition(header4)}`); // 输�
 console.log(`Header 5: ${getFilenameFromContentDisposition(header5)}`); // 输出: Header 5: semicolon;.txt
 ```
 
-**`saveAs(blob, fileName)`**
+**`saveAs(blob, fileName)`** [source](https://github.com/eligrey/FileSaver.js)
 
 重新导出了 `file-saver` 库的 `saveAs` 函数，方便实现文件下载，比简单的通过 a 标签下载兼容性更好。
 
