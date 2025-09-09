@@ -23,6 +23,41 @@ npm install simple-axios
 yarn add simple-axios
 ```
 
+## 📊 一个请求的流程
+
+```mermaid
+graph TD
+    subgraph 发起请求前
+        modify_request_header[<i class='fa fa-edit'></i> 修改请求头]
+        configure_user_id[<i class='fa fa-user'></i> 配置用户标识]
+    end
+
+    subgraph 请求处理后
+        handle_network_error[<i class='fa fa-unlink'></i> 网络错误处理]
+        handle_authorization_error[<i class='fa fa-shield'></i> 授权错误处理]
+        retry_on_exception[<i class='fa fa-refresh'></i> 异常请求重试]
+        handle_general_error[<i class='fa fa-exclamation-triangle'></i> 普通错误处理]
+    end
+
+    call_function[<i class='fa fa-cogs'></i> 调用请求函数] --> handle_params[<i class='fa fa-sliders'></i> 请求参数处理]
+    handle_params --> modify_request_header
+    configure_user_id --> initiate_request[<i class='fa fa-paper-plane'></i> 发起请求]
+    modify_request_header --> configure_user_id
+    initiate_request --> handle_network_error
+    handle_network_error --> handle_authorization_error
+    handle_authorization_error --> retry_on_exception
+    retry_on_exception --> handle_general_error
+    handle_general_error --> request_completed[<i class='fa fa-check-circle'></i> 请求完成]
+    request_completed --> return_params[<i class='fa fa-sliders'></i> 返回参数处理]
+
+    classDef normal fill:#fff,stroke:#44b6a9,stroke-width:2px,color:#333
+    classDef subprocess fill:#fff,stroke:#44b6a9,stroke-width:2px,color:#333
+    classDef box fill:#e0f5f5,stroke:#44b6a9,stroke-width:2px,stroke-dasharray: 5 5
+
+    class call_function,handle_params,modify_request_header,configure_user_id,initiate_request,handle_network_error,handle_authorization_error,retry_on_exception,handle_general_error,request_completed,return_params normal
+    class 发起请求前,请求处理后 box
+```
+
 ## 🚀 快速上手
 
 下面是一个集成了所有核心拦截器的示例，展示了 `simple-axios` 的使用方法，这是一个比较完整的示例，你简单修改后可以直接使用。
@@ -443,6 +478,8 @@ canvas.toBlob(function(blob) {
 ## 🤝 贡献
 
 欢迎提交 PR 和 Issue！
+
+本仓库使用 pnpm 管理 node 和 pnpm 版本，请确保你使用的是 pnpm v10 以上
 
 ## 📄 许可证
 
