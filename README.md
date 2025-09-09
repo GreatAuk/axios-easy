@@ -1,7 +1,15 @@
 # simple-axios
 
-[![npm version](https://img.shields.io/npm/v/simple-axios.svg)](https://www.npmjs.com/package/simple-axios)
-[![license](https://img.shields.io/npm/l/simple-axios.svg)](https://github.com/GreatAuk/simple-axios/blob/main/LICENSE)
+<p align="center">
+    <a href="https://www.npmjs.com/package/simple-axios" target="__blank">
+      <img src="https://img.shields.io/npm/v/simple-axios.svg?style=flat-square&colorB=51C838" alt="NPM Version" />
+    </a>
+    <!-- <a href="https://www.npmjs.com/package/@plugin-web-update-notification/core" target="__blank"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/@plugin-web-update-notification/core?color=50a36f&label="></a> -->
+    <a href="https://github.com/GreatAuk/simple-axios/blob/main/LICENSE">
+      <img src="https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square" alt="License" />
+    </a>
+    <br>
+</p>
 
 `simple-axios` 是一个为 [axios](https://axios-http.com/) 设计的轻量级工具函数库。它通过提供一系列即插即用的 `axios` 拦截器(没有其他黑科技)，帮助你优雅地处理请求和响应的通用逻辑，让你的代码更整洁、更易于维护。
 
