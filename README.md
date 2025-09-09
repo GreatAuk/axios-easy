@@ -20,6 +20,7 @@
 - **🚀 功能强大**: 内置认证、响应格式化、错误处理、请求重试（集成的第三方）、文件下载等常用场景的最佳实践。
 - **💧 类型友好**: 使用 TypeScript 编写，提供完整的类型定义，带来卓越的开发体验。
 - **👌 使用简单**: API 设计简洁直观，只需几行代码即可集成到你的项目中，没有其他黑科技，只是通过 `axios` 拦截器来实现，源码简单易懂。
+- **🧪 单元测试**: 所有功能都有单元测试覆盖，确保功能稳定可靠。
 
 ## 📦 安装
 
@@ -568,6 +569,10 @@ canvas.toBlob(function(blob) {
   saveAs(blob, "pretty image.png");
 });
 ```
+
+## 搭配 [openapi-ts-request](https://github.com/openapi-ui/openapi-ts-request) 使用 [查看示例](https://github.com/GreatAuk/openapi-ts-request/blob/main/openapi-ts-request.md)
+
+个人特定工作场景使用，无需参考。
 
 ## 🤝 贡献
 
