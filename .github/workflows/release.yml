@@ -7,6 +7,9 @@ on:
   push:
     tags:
       - 'v*'
+  # 手动触发
+  # 允许手动从 Actions tab 运行这个 workflows
+  workflow_dispatch:
 
 jobs:
   release:
