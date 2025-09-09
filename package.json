@@ -1,17 +1,17 @@
 {
-  "name": "simple-axios",
+  "name": "axios-easy",
   "version": "0.0.1",
   "description": "A simple axios library",
   "type": "module",
   "license": "MIT",
   "packageManager": "pnpm@10.15.0",
-  "homepage": "https://github.com/GreatAuk/simple-axios",
+  "homepage": "https://github.com/GreatAuk/axios-easy",
   "bugs": {
-    "url": "https://github.com/GreatAuk/simple-axios/issues"
+    "url": "https://github.com/GreatAuk/axios-easy/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GreatAuk/simple-axios.git"
+    "url": "git+https://github.com/GreatAuk/axios-easy.git"
   },
   "author": "GreatAuk <greatauk11@gmail.com>",
   "files": [

@@ -1,17 +1,17 @@
-# simple-axios
+# axios-easy
 
 <p align="center">
-    <a href="https://www.npmjs.com/package/simple-axios" target="__blank">
-      <img src="https://img.shields.io/npm/v/simple-axios.svg?style=flat-square&colorB=51C838" alt="NPM Version" />
+    <a href="https://www.npmjs.com/package/axios-easy" target="__blank">
+      <img src="https://img.shields.io/npm/v/axios-easy.svg?style=flat-square&colorB=51C838" alt="NPM Version" />
     </a>
     <!-- <a href="https://www.npmjs.com/package/@plugin-web-update-notification/core" target="__blank"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/@plugin-web-update-notification/core?color=50a36f&label="></a> -->
-    <a href="https://github.com/GreatAuk/simple-axios/blob/main/LICENSE">
+    <a href="https://github.com/GreatAuk/axios-easy/blob/main/LICENSE">
       <img src="https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square" alt="License" />
     </a>
     <br>
 </p>
 
-`simple-axios` 是一个为 [axios](https://axios-http.com/) 设计的轻量级工具函数库。它通过提供一系列即插即用的 `axios` 拦截器(没有其他黑科技)，帮助你优雅地处理请求和响应的通用逻辑，让你的代码更整洁、更易于维护。
+`axios-easy` 是一个为 [axios](https://axios-http.com/) 设计的轻量级工具函数库。它通过提供一系列即插即用的 `axios` 拦截器(没有其他黑科技)，帮助你优雅地处理请求和响应的通用逻辑，让你的代码更整洁、更易于维护。
 
 ## ✨ 特性
 
@@ -25,11 +25,11 @@
 ## 📦 安装
 
 ```bash
-pnpm install simple-axios
+pnpm install axios-easy
 # or
-npm install simple-axios
+npm install axios-easy
 # or
-yarn add simple-axios
+yarn add axios-easy
 ```
 
 ## 📊 一个请求的流程
@@ -69,17 +69,17 @@ graph TD
 
 ## 🚀 快速上手
 
-下面是一个集成了所有核心拦截器的示例，展示了 `simple-axios` 的使用方法，这是一个比较完整的示例，你简单修改后可以直接使用。
+下面是一个集成了所有核心拦截器的示例，展示了 `axios-easy` 的使用方法，这是一个比较完整的示例，你简单修改后可以直接使用。
 
 ```ts
 import axios from 'axios';
 import type { AxiosError, AxiosResponse } from 'axios';
 
 // 从各个模块按需导入拦截器创建函数
-import { createDefaultRequestInterceptor } from 'simple-axios/default-request-interceptor';
-import { createDefaultResponseInterceptor } from 'simple-axios/default-response-interceptor';
-import { createAuthenticateInterceptor } from 'simple-axios/authenticate-interceptor';
-import { createErrorMessageInterceptor } from 'simple-axios/error-message-interceptor';
+import { createDefaultRequestInterceptor } from 'axios-easy/default-request-interceptor';
+import { createDefaultResponseInterceptor } from 'axios-easy/default-response-interceptor';
+import { createAuthenticateInterceptor } from 'axios-easy/authenticate-interceptor';
+import { createErrorMessageInterceptor } from 'axios-easy/error-message-interceptor';
 
 // 请求重试功能，如果使用，请安装 axios-retry
 // import axiosRetry from 'axios-retry';
@@ -211,7 +211,7 @@ async function getUserInfo() {
 
 ## 📚 API 文档
 
-### `simple-axios/default-request-interceptor` [source](https://github.com/GreatAuk/simple-axios/blob/main/src/default-request-interceptor/index.ts)
+### `axios-easy/default-request-interceptor` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/default-request-interceptor/index.ts)
 
 此拦截器用于优化请求行为。
 
@@ -233,7 +233,7 @@ export type DefaultRequestInterceptorOptions = {
 
 **使用**:
 ```ts
-import { createDefaultRequestInterceptor } from 'simple-axios/default-request-interceptor';
+import { createDefaultRequestInterceptor } from 'axios-easy/default-request-interceptor';
 
 createDefaultRequestInterceptor(axiosInstance, {
   extendTimeoutWhenDownload: true, // 默认为 true，下载文件时自动延长超时时间，防止因文件过大导致下载超时
@@ -242,7 +242,7 @@ createDefaultRequestInterceptor(axiosInstance, {
 
 ---
 
-### `simple-axios/default-response-interceptor` [source](https://github.com/GreatAuk/simple-axios/blob/main/src/default-response-interceptor/index.ts)
+### `axios-easy/default-response-interceptor` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/default-response-interceptor/index.ts)
 
 此拦截器用于标准化响应数据结构，让你在业务代码中只关心核心数据。
 
@@ -285,7 +285,7 @@ export type DefaultResponseInterceptorOptions = {
 
 **使用**:
 ```ts
-import { createDefaultResponseInterceptor } from 'simple-axios/default-response-interceptor';
+import { createDefaultResponseInterceptor } from 'axios-easy/default-response-interceptor';
 
 // 假设后端接口结构为 { resultCode: 'SUCCESS', data: { ... } }
 createDefaultResponseInterceptor(axiosInstance, {
@@ -364,7 +364,7 @@ export function isServerError(error: any): error is ServerError {
 ```
 ---
 
-### `simple-axios/error-message-interceptor` [source](https://github.com/GreatAuk/simple-axios/blob/main/src/error-message-interceptor/index.ts)
+### `axios-easy/error-message-interceptor` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/error-message-interceptor/index.ts)
 
 此拦截器用于统一捕获和处理所有请求错误，并提供友好的错误提示。
 
@@ -386,7 +386,7 @@ export type HandleErrorMessage = (error: AxiosResponse<any, any>, networkErrMsg:
 你需要传入一个回调函数，该函数接收两个参数：`error` (Axios 响应对象) 和 `networkErrMsg` (拦截器生成的标准化错误信息)。
 
 ```ts
-import { createErrorMessageInterceptor } from 'simple-axios/error-message-interceptor';
+import { createErrorMessageInterceptor } from 'axios-easy/error-message-interceptor';
 
 createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
   // 优先使用后端返回的错误描述
@@ -407,7 +407,7 @@ createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
 
 ---
 
-### `simple-axios/authenticate-interceptor` [source](https://github.com/GreatAuk/simple-axios/blob/main/src/authenticate-interceptor/index.ts)
+### `axios-easy/authenticate-interceptor` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/authenticate-interceptor/index.ts)
 
 这是一个认证处理拦截器，专门用于处理登录状态失效（如 401）和 Token 自动续期。
 
@@ -451,7 +451,7 @@ export type AuthenticateInterceptorOptions = {
 
 **使用**:
 ```ts
-import { createAuthenticateInterceptor } from 'simple-axios/authenticate-interceptor';
+import { createAuthenticateInterceptor } from 'axios-easy/authenticate-interceptor';
 
 createAuthenticateInterceptor(axiosInstance, {
   isAuthenticateFailed: (error) => error.response?.status === 401,
@@ -469,11 +469,11 @@ createAuthenticateInterceptor(axiosInstance, {
 
 ---
 
-### `simple-axios/utils`
+### `axios-easy/utils`
 
 提供一些在网络请求中非常实用的辅助函数。
 
-**`processFileStream(response, options)`** [source](https://github.com/GreatAuk/simple-axios/blob/main/src/utils/processFileStream.ts)
+**`processFileStream(response, options)`** [source](https://github.com/GreatAuk/axios-easy/blob/main/src/utils/processFileStream.ts)
 
 处理文件下载流的核心函数。它能智能判断响应是文件流还是包含错误信息的 JSON。
 
@@ -499,7 +499,7 @@ export type ProcessFileStreamOptions = {
 
 **使用**:
 ```ts
-import { processFileStream } from 'simple-axios/utils';
+import { processFileStream } from 'axios-easy/utils';
 
 async function handleExport() {
   try {
@@ -523,14 +523,14 @@ async function handleExport() {
 }
 ```
 
-**`getFilenameFromContentDisposition`** [source](https://github.com/GreatAuk/simple-axios/blob/main/src/utils/getFilenameFromContentDisposition.ts)
+**`getFilenameFromContentDisposition`** [source](https://github.com/GreatAuk/axios-easy/blob/main/src/utils/getFilenameFromContentDisposition.ts)
 
 从 `content-disposition` 响应头中安全地解析出文件名。支持 filename*=(RFC-5987) 和 filename= 格式。
 
 **使用**
 
 ```ts
-import { getFilenameFromContentDisposition } from 'simple-axios/utils';
+import { getFilenameFromContentDisposition } from 'axios-easy/utils';
 
 const fileName = getFilenameFromContentDisposition(response.headers['content-disposition']);
 
@@ -552,7 +552,7 @@ console.log(`Header 5: ${getFilenameFromContentDisposition(header5)}`); // 输�
 重新导出了 `file-saver` 库的 `saveAs` 函数，方便实现文件下载，比简单的通过 a 标签下载兼容性更好。
 
 ```ts
-import { saveAs } from 'simple-axios/utils';
+import { saveAs } from 'axios-easy/utils';
 ```
 
 ```ts

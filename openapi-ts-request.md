@@ -5,7 +5,7 @@
 `easy-axios` 为 `openapi-ts-request` 提供了一些工具函数。
 
 ```ts
-import { patchApiJSON, toUpperFirstLetter } from 'simple-axios/openapi-ts-request-util';
+import { patchApiJSON, toUpperFirstLetter } from 'axios-easy/openapi-ts-request-util';
 ```
 
 ### 1. 定义通用 request 函数供 openapi-ts-request 使用
@@ -39,7 +39,7 @@ import type { APIDataType } from 'openapi-ts-request/dist/generator/type';
 
 import { generateService } from 'openapi-ts-request';
 import { genDefaultFunctionName } from 'openapi-ts-request/dist/generator/util';
-import { patchApiJSON, toUpperFirstLetter } from 'simple-axios/openapi-ts-request-util';
+import { patchApiJSON, toUpperFirstLetter } from 'axios-easy/openapi-ts-request-util';
 
 /**
  * http://domain.com/swagger-ui.html?docExpansion=list#/
