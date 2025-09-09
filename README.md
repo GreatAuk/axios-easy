@@ -570,7 +570,7 @@ canvas.toBlob(function(blob) {
 });
 ```
 
-## 搭配 [openapi-ts-request](https://github.com/openapi-ui/openapi-ts-request) 使用 [查看示例](https://github.com/GreatAuk/openapi-ts-request/blob/main/openapi-ts-request.md)
+## 搭配 [openapi-ts-request](https://github.com/openapi-ui/openapi-ts-request) 使用 [查看](https://github.com/GreatAuk/axios-easy/blob/main/openapi-ts-request.md)
 
 个人特定工作场景使用，无需参考。
 
