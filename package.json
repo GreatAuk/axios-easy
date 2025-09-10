@@ -42,6 +42,11 @@
       "import": "./dist/authenticate-interceptor.js",
       "require": "./dist/authenticate-interceptor.js"
     },
+    "./params-serializer-interceptor": {
+      "types": "./dist/params-serializer-interceptor/index.d.ts",
+      "import": "./dist/params-serializer-interceptor.js",
+      "require": "./dist/params-serializer-interceptor.js"
+    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils.js",
@@ -60,6 +65,7 @@
     "build": "stale-dep && tsdown",
     "dev": "stale-dep && tsdown --watch",
     "test": "stale-dep && vitest",
+    "test:once": "stale-dep && vitest run",
     "coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "release": "bumpp",
@@ -69,6 +75,7 @@
   "devDependencies": {
     "@types/file-saver": "^2.0.7",
     "@types/node": "^22.15.17",
+    "@types/qs": "^6.14.0",
     "@vitest/coverage-v8": "^3.2.4",
     "axios-mock-adapter": "^2.1.0",
     "bumpp": "^10.1.0",
@@ -84,6 +91,7 @@
   },
   "dependencies": {
     "axios": "^1.11.0",
-    "file-saver": "^2.0.5"
+    "file-saver": "^2.0.5",
+    "qs": "^6.14.0"
   }
 }
