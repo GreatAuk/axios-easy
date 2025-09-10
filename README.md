@@ -75,14 +75,17 @@ graph TD
 下面是一个集成了所有核心拦截器的示例，展示了 `axios-easy` 的使用方法，这是一个比较完整的示例，你简单修改后可以直接使用。
 
 ```ts
-import axios from 'axios';
 import type { AxiosError, AxiosResponse } from 'axios';
+import axios from 'axios';
 
 // 从各个模块按需导入拦截器创建函数
 import { createDefaultRequestInterceptor } from 'axios-easy/default-request-interceptor';
 import { createDefaultResponseInterceptor } from 'axios-easy/default-response-interceptor';
 import { createAuthenticateInterceptor } from 'axios-easy/authenticate-interceptor';
 import { createErrorMessageInterceptor } from 'axios-easy/error-message-interceptor';
+
+// 这个一般不需要使用，用于发送 application/x-www-form-urlencoded 格式的数据。一般默认的 JSON 数据（这也是现代 Web 开发中最常见的）就可以了。
+// import { createParamsSerializerInterceptor } from 'axios-easy/params-serializer-interceptor';
 
 // 请求重试功能，如果使用，请安装 axios-retry
 // import axiosRetry from 'axios-retry';
@@ -122,6 +125,11 @@ axiosInstance.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// 应用参数序列化拦截器 (可选，需要发送 form-urlencoded 数据时使用)
+// createParamsSerializerInterceptor(axiosInstance, {
+//   qsStringifyArrayFormat: 'brackets' // 按需选择，不传也行，默认使用 indices 格式。
+// });
 
  // 应用默认请求拦截器
 createDefaultRequestInterceptor(axiosInstance, {
@@ -286,6 +294,38 @@ export type DefaultResponseInterceptorOptions = {
 };
 ```
 
+**类型扩展**:
+此拦截器会为 `AxiosRequestConfig` 扩展一个新的属性：
+```ts
+interface AxiosRequestConfig {
+  /**
+   * 响应数据的返回方式。
+   * - raw: 原始的 AxiosResponse，包括 headers、status 等，不做是否成功请求的检查。（返回 `axiosRes`）
+   * - body: 返回响应数据的 body 部分。（返回 `axiosRes.data` ）
+   * - data: 解构响应的 body 数据，只返回其中的 dataField 节点数据。（返回 `axiosRes.data.list`）
+   * @default 'body'
+   *
+   * **axiosRes 是 axios 的默认响应对象**
+   * ```ts
+   * const axiosRes = {
+      // `data` 由服务器提供的响应
+      data: {
+        code: 0,
+        list: [],
+        errorMessage: '',
+      },
+      // `status` 来自服务器响应的 HTTP 状态码
+      status: 200,,
+      // `headers` 是服务器响应头
+      headers: {},
+      ...
+    }
+    * ```
+    */
+  responseReturn?: 'body' | 'data' | 'raw';
+}
+```
+
 **使用**:
 ```ts
 import { createDefaultResponseInterceptor } from 'axios-easy/default-response-interceptor';
@@ -385,6 +425,21 @@ export function isServerError(error: any): error is ServerError {
 export type HandleErrorMessage = (error: AxiosResponse<any, any>, networkErrMsg: string) => void;
 ```
 
+**类型扩展**:
+此拦截器会为 `AxiosRequestConfig` 扩展一个新的属性：
+```ts
+interface AxiosRequestConfig {
+  /**
+   * Error message prompt type。这个提示 ui 需要开发自己定义   client.addResponseInterceptor(errorMessageResponseInterceptor（...））
+   * - message: 使用 message 提示错误信息, 如 Element Plus 或 antdv 的 message.error
+   * - modal: 使用 modal 提示错误信息, 如 antdv 的 Modal.error 或 Element Plus 的 ElMessage.error
+   * - none: 不提示错误信息
+   * @default 'message'
+   */
+  errorMessageMode?: 'message' | 'modal' | 'none';
+}
+```
+
 **使用**:
 你需要传入一个回调函数，该函数接收两个参数：`error` (Axios 响应对象) 和 `networkErrMsg` (拦截器生成的标准化错误信息)。
 
@@ -469,6 +524,91 @@ createAuthenticateInterceptor(axiosInstance, {
   },
 });
 ```
+
+---
+
+### `axios-easy/params-serializer-interceptor` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/params-serializer-interceptor/index.ts)
+
+参数序列化请求拦截器，内部使用 [qs](https://github.com/ljharb/qs) 库对请求参数进行序列化，特别适用于需要发送 `application/x-www-form-urlencoded` 格式数据的场景。一般不需要使用。
+
+**类型扩展**:
+此拦截器会为 `AxiosRequestConfig` 扩展一个新的属性：
+```ts
+interface AxiosRequestConfig {
+  /**
+   * 格式说明：
+   * - 'brackets': arr[]=1&arr[]=2
+   * - 'indices': arr[0]=1&arr[1]=2
+   * - 'repeat': arr=1&arr=2
+   * - 'comma': arr=1,2
+   */
+  qsStringifyArrayFormat?: 'brackets' | 'indices' | 'repeat' | 'comma';
+}
+```
+
+**配置选项 (`ParamsSerializerInterceptorOptions`)**:
+
+```ts
+export type ParamsSerializerInterceptorOptions = {
+  /**
+   * 全局数组参数序列化格式
+   * @default 'indices' (qs 库默认格式)
+   */
+  qsStringifyArrayFormat?: 'brackets' | 'indices' | 'repeat' | 'comma';
+};
+```
+
+**数组序列化格式对比**:
+
+假设参数为 `{ tags: ['frontend', 'backend'] }`：
+
+| 格式 | 序列化结果 | 说明 |
+|------|------------|------|
+| `'brackets'` | `tags[]=frontend&tags[]=backend` | 使用空方括号 |
+| `'indices'` | `tags[0]=frontend&tags[1]=backend` | 使用索引方括号（qs 默认） |
+| `'repeat'` | `tags=frontend&tags=backend` | 重复参数名 |
+| `'comma'` | `tags=frontend,backend` | 逗号分隔 |
+
+**使用**:
+
+```ts
+import { createParamsSerializerInterceptor } from 'axios-easy/params-serializer-interceptor';
+
+// 1. 安装拦截器并设置全局配置
+const interceptorId = createParamsSerializerInterceptor(axiosInstance, {
+  qsStringifyArrayFormat: 'brackets' // 全局默认使用 brackets 格式
+});
+
+// 2. 普通请求 - 使用全局配置
+axiosInstance.get('/api/users', {
+  params: {
+    tags: ['frontend', 'backend'], // 序列化为: tags[]=frontend&tags[]=backend
+    active: true,
+    page: 1
+  }
+});
+
+// 3. 请求级别配置 - 覆盖全局配置
+// qsStringifyArrayFormat 现在是 AxiosRequestConfig 的合法属性
+axiosInstance.get('/api/search', {
+  params: {
+    categories: ['tech', 'news']
+  },
+  qsStringifyArrayFormat: 'comma' // 本次请求使用逗号分隔: categories=tech,news
+});
+
+// 5. 不传配置时使用 qs 默认格式 (indices)
+createParamsSerializerInterceptor(axiosInstance); // 使用 indices 格式
+
+// 6. 移除拦截器
+axiosInstance.interceptors.request.eject(interceptorId);
+```
+
+**使用场景**:
+- 与传统后端接口对接，需要发送 `application/x-www-form-urlencoded` 格式数据
+- 后端对数组参数有特定格式要求
+- 需要序列化复杂的嵌套对象参数
+- 不同接口需要不同的参数序列化格式
 
 ---
 
@@ -576,6 +716,10 @@ canvas.toBlob(function(blob) {
 ## 搭配 [openapi-ts-request](https://github.com/openapi-ui/openapi-ts-request) 使用 [查看](https://github.com/GreatAuk/axios-easy/blob/main/openapi-ts-request.md)
 
 个人特定工作场景使用，无需参考。
+
+## 感谢
+
+参考了 [vue-vben-admin](https://github.com/vbenjs/vue-vben-admin/tree/main/packages/effects/request) 的 request 实现。
 
 ## 🤝 贡献
 
