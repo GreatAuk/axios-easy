@@ -16,6 +16,23 @@
 
 `axios-easy` 是一个为 [axios](https://axios-http.com/) 设计的轻量级工具函数库。它通过提供一系列即插即用的 `axios` 拦截器(没有其他黑科技)，帮助你优雅地处理请求和响应的通用逻辑，让你的代码更整洁、更易于维护。
 
+## 目录
+
+- [✨ 特性](#-特性)
+- [📦 安装](#-安装)
+- [📊 请求流程图](#-请求流程图)
+- [🚀 快速上手](#-快速上手)
+- [📚 API 文档](#-api-文档)
+  - [`axios-easy/default-request-interceptor`](#axios-easydefault-request-interceptor-source)
+  - [`axios-easy/default-response-interceptor`](#axios-easydefault-response-interceptor-source)
+  - [`axios-easy/error-message-interceptor`](#axios-easyerror-message-interceptor-source)
+  - [`axios-easy/authenticate-interceptor`](#axios-easyauthenticate-interceptor-source)
+  - [`axios-easy/params-serializer-interceptor`](#axios-easyparams-serializer-interceptor-source)
+  - [`axios-easy/utils`](#axios-easyutils)
+- [搭配 openapi-ts-request 使用](#搭配-openapi-ts-request-使用-查看)
+- [🤝 贡献](#-贡献)
+- [📄 许可证](#-许可证)
+
 ## ✨ 特性
 
 - **🔌 高度可组合**: 提供独立的拦截器，你可以像乐高积木一样按需组合，只添加你需要的功能。
@@ -35,13 +52,14 @@ npm install axios-easy
 yarn add axios-easy
 ```
 
-## 📊 一个请求的流程
+## 📊 请求流程图
 
 ```mermaid
 graph TD
     subgraph 发起请求前
         modify_request_header[<i class='fa fa-edit'></i> 修改请求头]
         configure_user_id[<i class='fa fa-user'></i> 配置用户标识]
+        serialize_params[<i class='fa fa-wrench'></i> 参数序列化，非必需]
     end
 
     subgraph 请求处理后
@@ -53,6 +71,8 @@ graph TD
 
     call_function[<i class='fa fa-cogs'></i> 调用请求函数] --> handle_params[<i class='fa fa-sliders'></i> 请求参数处理]
     handle_params --> modify_request_header
+    handle_params --> serialize_params
+    serialize_params --> configure_user_id
     configure_user_id --> initiate_request[<i class='fa fa-paper-plane'></i> 发起请求]
     modify_request_header --> configure_user_id
     initiate_request --> handle_network_error
