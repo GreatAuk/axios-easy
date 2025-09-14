@@ -68,7 +68,7 @@ export function normalizeRequestPayload<T = any>(
     trim: true,
     dropUndefined: false,
     emptyStringToNull: false,
-    ...(options || {}),
+    ...options,
   }
 
   return normalizeDeep(payload, opts);

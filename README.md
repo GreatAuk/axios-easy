@@ -37,7 +37,7 @@
 
 - **🔌 高度可组合**: 提供独立的拦截器，你可以像乐高积木一样按需组合，只添加你需要的功能。
 - **🌳 Tree-Shakable**: 所有工具和拦截器都支持按需加载，确保最终打包体积最小化。
-- **🚀 功能强大**: 内置认证、响应格式化、错误处理、请求重试（集成的第三方）、文件下载等常用场景的最佳实践。
+- **🚀 功能强大**: 内置认证、请求参数格式化、响应格式化、错误处理、请求重试（集成的第三方）、文件下载等常用场景的最佳实践。
 - **💧 类型友好**: 使用 TypeScript 编写，提供完整的类型定义，带来卓越的开发体验。
 - **👌 使用简单**: API 设计简洁直观，只需几行代码即可集成到你的项目中，没有其他黑科技，只是通过 `axios` 拦截器来实现，源码简单易懂。
 - **🧪 单元测试**: 所有功能都有单元测试覆盖，确保功能稳定可靠。
@@ -153,7 +153,12 @@ axiosInstance.interceptors.request.use((config) => {
 
  // 应用默认请求拦截器
 createDefaultRequestInterceptor(axiosInstance, {
-  extendTimeoutWhenDownload: true, // 下载文件时自动延长超时时间，防止因文件过大导致下载超时
+  extendTimeoutWhenDownload: true, // 下载文件时自动延长超时时间（默认超时时间 * 10），防止因文件过大导致下载超时
+  normalizePayload: {
+    trim: true,           // 去除字符串首尾空白
+    dropUndefined: true,  // 删除 undefined 值
+    emptyStringToNull: true, // 空字符串转为 null
+  },
 });
 
 // 应用默认响应拦截器 (主要处理数据结构)
@@ -248,6 +253,7 @@ async function getUserInfo() {
 
 **功能**:
 - **下载场景下延长 timeout**: 当检测到请求是用于下载文件时（`responseType` 为 `'blob'` 或 `'arraybuffer'`），会自动延长该请求的超时时间（默认为基础超时时间的 10 倍），防止因文件过大导致下载超时。
+- **请求参数规范化**: 支持在发送请求前对 `data` 和 `params` 进行统一的数据清洗，包括字符串 trim、删除 undefined 值、空字符串转 null 等操作。
 
 **配置选项 (`DefaultRequestInterceptorOptions`)**:
 
@@ -259,7 +265,38 @@ export type DefaultRequestInterceptorOptions = {
    * @default true
    */
   extendTimeoutWhenDownload?: boolean;
+  /**
+   * 是否在请求前规范化传参（仅处理普通对象/数组）
+   * - trim: 是否去除字符串首尾空白，默认 false
+   * - dropUndefined: 是否删除值为 undefined 的键/数组元素，默认 false
+   * - emptyStringToNull: 是否将空字符串转换为 null，默认 false
+   */
+  normalizePayload?: {
+    trim?: boolean;
+    dropUndefined?: boolean;
+    emptyStringToNull?: boolean;
+  };
 };
+```
+
+**类型扩展**:
+此拦截器会为 `AxiosRequestConfig` 扩展一个新的属性：
+```ts
+interface AxiosRequestConfig {
+  /**
+   * 是否在请求前规范化传参（仅处理普通对象/数组）
+   * - trim: 是否去除字符串首尾空白，默认 false
+   * - dropUndefined: 是否删除值为 undefined 的键/数组元素，默认 false
+   * - emptyStringToNull: 是否将空字符串转换为 null，默认 false
+   *
+   * 未设置时，等价于 `{ trim: false, dropUndefined: false, emptyStringToNull: false }`
+   */
+  normalizePayload?: {
+    trim?: boolean;
+    dropUndefined?: boolean;
+    emptyStringToNull?: boolean;
+  };
+}
 ```
 
 **使用**:
@@ -268,7 +305,29 @@ import { createDefaultRequestInterceptor } from 'axios-easy/default-request-inte
 
 createDefaultRequestInterceptor(axiosInstance, {
   extendTimeoutWhenDownload: true, // 默认为 true，下载文件时自动延长超时时间，防止因文件过大导致下载超时
+  normalizePayload: {
+    trim: true,           // 去除字符串首尾空白
+    dropUndefined: true,  // 删除 undefined 值
+    emptyStringToNull: true, // 空字符串转为 null
+  },
 });
+
+// 也可以在单个请求中配置，会覆盖拦截器的全局配置
+axiosInstance.post('/api/users',
+  {
+    name: ' Alice  ',
+    age: undefined,
+    email: '   '
+  },
+  {
+    normalizePayload: {
+      trim: true,
+      dropUndefined: true,
+      emptyStringToNull: true,
+    }
+  }
+);
+// 实际发送的数据为: { name: 'Alice', email: null }
 ```
 
 ---

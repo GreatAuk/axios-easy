@@ -51,4 +51,61 @@ describe('defaultRequestInterceptor', () => {
       expect(newConfig.timeout).toBe(1000);
     });
   })
+
+  describe('config.normalizePayload', () => {
+    it('默认所有选项为 false：不应变更 payload', () => {
+      interceptorId = createDefaultRequestInterceptor(axiosInstance, { extendTimeoutWhenDownload: false });
+      const handler = (axiosInstance.interceptors.request as any).handlers[interceptorId]?.fulfilled as (cfg: any) => any;
+
+      const config = {
+        timeout: 1000,
+        data: { s: ' a ', x: undefined, arr: [' a ', undefined] },
+      } as any;
+      const newConfig = handler(config);
+
+      expect(newConfig.data).toEqual({ s: ' a ', x: undefined, arr: [' a ', undefined] });
+    });
+
+    it('当设置 trim=true 时，应去除字符串空白', () => {
+      interceptorId = createDefaultRequestInterceptor(axiosInstance, { extendTimeoutWhenDownload: false });
+      const handler = (axiosInstance.interceptors.request as any).handlers[interceptorId]?.fulfilled as (cfg: any) => any;
+
+      const config = {
+        timeout: 1000,
+        data: { s: ' a ', arr: [' b ', '  c  '] },
+        normalizePayload: { trim: true },
+      } as any;
+      const newConfig = handler(config);
+
+      expect(newConfig.data).toEqual({ s: 'a', arr: ['b', 'c'] });
+    });
+
+    it('当设置 dropUndefined=true 时，应删除 undefined', () => {
+      interceptorId = createDefaultRequestInterceptor(axiosInstance, { extendTimeoutWhenDownload: false });
+      const handler = (axiosInstance.interceptors.request as any).handlers[interceptorId]?.fulfilled as (cfg: any) => any;
+
+      const config = {
+        timeout: 1000,
+        data: { a: undefined, b: 'x', arr: [undefined, 'y', undefined] },
+        normalizePayload: { dropUndefined: true },
+      } as any;
+      const newConfig = handler(config);
+
+      expect(newConfig.data).toEqual({ b: 'x', arr: ['y'] });
+    });
+
+    it('当 trim=true 且 emptyStringToNull=true 时，应将空字符串转为 null', () => {
+      interceptorId = createDefaultRequestInterceptor(axiosInstance, { extendTimeoutWhenDownload: false });
+      const handler = (axiosInstance.interceptors.request as any).handlers[interceptorId]?.fulfilled as (cfg: any) => any;
+
+      const config = {
+        timeout: 1000,
+        data: { a: '  ', b: '', c: ' text ' },
+        normalizePayload: { trim: true, emptyStringToNull: true },
+      } as any;
+      const newConfig = handler(config);
+
+      expect(newConfig.data).toEqual({ a: null, b: null, c: 'text' });
+    });
+  })
 });
