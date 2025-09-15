@@ -38,6 +38,7 @@
 - **🔌 高度可组合**: 提供独立的拦截器，你可以像乐高积木一样按需组合，只添加你需要的功能。
 - **🌳 Tree-Shakable**: 所有工具和拦截器都支持按需加载，确保最终打包体积最小化。
 - **🚀 功能强大**: 内置认证、请求参数格式化、响应格式化、错误处理、请求重试（集成的第三方）、文件下载等常用场景的最佳实践。
+- **🌐 国际化支持**: 错误信息拦截器内置中英文国际化支持，支持全局语言管理和动态切换。
 - **💧 类型友好**: 使用 TypeScript 编写，提供完整的类型定义，带来卓越的开发体验。
 - **👌 使用简单**: API 设计简洁直观，只需几行代码即可集成到你的项目中，没有其他黑科技，只是通过 `axios` 拦截器来实现，源码简单易懂。
 - **🧪 单元测试**: 所有功能都有单元测试覆盖，确保功能稳定可靠。
@@ -102,7 +103,7 @@ import axios from 'axios';
 import { createDefaultRequestInterceptor } from 'axios-easy/default-request-interceptor';
 import { createDefaultResponseInterceptor } from 'axios-easy/default-response-interceptor';
 import { createAuthenticateInterceptor } from 'axios-easy/authenticate-interceptor';
-import { createErrorMessageInterceptor } from 'axios-easy/error-message-interceptor';
+import { createErrorMessageInterceptor, setGlobalLanguage } from 'axios-easy/error-message-interceptor';
 
 // 使用 qs 库对请求参数进行序列化，这个一般不需要使用，用于发送 application/x-www-form-urlencoded 格式的数据。默认的 application/json 数据（这也是现代 Web 开发中最常见的）就可以了。
 // import { createParamsSerializerInterceptor } from 'axios-easy/params-serializer-interceptor';
@@ -126,6 +127,9 @@ const AUTH_ERROR_CODES = [
   'TOKEN_DEFAULT_ERROR', // 当前会话未登录
   'TOKEN_TIMEOUT', // Token 已过期
 ]
+
+// 设置错误信息语言（可选，默认中文）
+// setGlobalLanguage('en'); // 设置为英文
 
 // 创建 Axios 实例
 const axiosInstance = axios.create({
@@ -198,7 +202,7 @@ createAuthenticateInterceptor(axiosInstance, {
 // })
 
 // 应用错误消息拦截器 (统一错误提示, 在这里定义业务错误提示)
-createErrorMessageInterceptor(axiosInstance, (error: AxiosResponse<ApiResponse<any>>, networkErrMsg, 'zh') => {
+createErrorMessageInterceptor(axiosInstance, (error: AxiosResponse<ApiResponse<any>>, networkErrMsg) => {
   const { data, config } = error;
 
   // 如果单独配置了不提示错误信息，则直接返回
@@ -492,6 +496,7 @@ export function isServerError(error: any): error is ServerError {
 
 **功能**:
 - **标准化错误信息**: 将网络错误、超时、HTTP 错误（4xx, 5xx）等转化为用户易于理解的提示信息。
+- **国际化支持**: 支持中英文错误信息，提供全局语言管理和请求级别语言设置。
 - **自定义处理**: 你需要提供一个处理函数，来自定义如何显示错误信息（例如使用 `Message` 或 `Modal` 组件）。
 
 **回调函数类型 (`HandleErrorMessage`)**:
@@ -505,7 +510,7 @@ export type HandleErrorMessage = (error: AxiosResponse<any, any>, networkErrMsg:
 ```
 
 **类型扩展**:
-此拦截器会为 `AxiosRequestConfig` 扩展一个新的属性：
+此拦截器会为 `AxiosRequestConfig` 扩展新的属性：
 ```ts
 interface AxiosRequestConfig {
   /**
@@ -516,10 +521,18 @@ interface AxiosRequestConfig {
    * @default 'message'
    */
   errorMessageMode?: 'message' | 'modal' | 'none';
+  /**
+   * 错误信息语言
+   * - zh: 中文
+   * - en: 英文
+   * 未设置时将使用全局语言设置或拦截器默认语言
+   */
+  errorMessageLanguage?: 'zh' | 'en';
 }
 ```
 
-**使用**:
+**基本使用**:
+
 你需要传入一个回调函数，该函数接收两个参数：`error` (Axios 响应对象) 和 `networkErrMsg` (拦截器生成的标准化错误信息)。
 
 ```ts
@@ -530,7 +543,7 @@ createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
   const errorMessage = error.data?.errorCodeDes || networkErrMsg || '未知错误';
 
   // 使用你项目的 UI 库进行提示
-  // ElMessage.error(finalMessage);
+  // ElMessage.error(errorMessage);
   console.error(errorMessage);
 
   // 你还可以根据请求配置的 errorMessageMode 来决定提示方式
@@ -540,6 +553,32 @@ createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
     // ...其他处理
   }
 });
+```
+
+**国际化使用**:
+```ts
+import { createErrorMessageInterceptor, setGlobalLanguage } from 'axios-easy/error-message-interceptor';
+
+// 1. 设置全局语言（推荐方式）
+setGlobalLanguage('en'); // 设置为英文
+createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
+  console.error(networkErrMsg); // 自动显示英文错误信息
+});
+
+// 2. 单个请求设置语言
+try {
+  const response = await axiosInstance.get('/api/data', {
+    errorMessageLanguage: 'zh' // 这个请求使用中文错误信息
+  });
+} catch (error) {
+  // 错误信息将显示中文
+}
+
+// 3. 动态切换语言
+function switchLanguage(newLanguage: 'zh' | 'en') {
+  setGlobalLanguage(newLanguage);
+  // 后续所有请求的错误信息都会使用新语言
+}
 ```
 
 ---
