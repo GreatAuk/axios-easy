@@ -734,7 +734,7 @@ axiosInstance.interceptors.request.eject(interceptorId);
 
 提供一些在网络请求中非常实用的辅助函数。
 
-**`normalizeRequestPayload(payload, options)`** [source](https://github.com/GreatAuk/axios-easy/blob/main/src/utils/normalizeRequestPayload.ts)
+#### `normalizeRequestPayload(payload, options)` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/utils/normalizeRequestPayload.ts)
 
 规范化请求负载（对象/数组），便于在发起请求前统一清洗数据。
 
@@ -797,7 +797,7 @@ axiosInstance.interceptors.request.use((config) => {
 // 若希望“移除”数组中的 undefined，请使用 dropUndefined: true。
 ```
 
-**`processFileStream(response, options)`** [source](https://github.com/GreatAuk/axios-easy/blob/main/src/utils/processFileStream.ts)
+#### `processFileStream(response, options)` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/utils/processFileStream.ts)
 
 处理文件下载流的核心函数。它能智能判断响应是文件流还是包含错误信息的 JSON。
 
@@ -847,7 +847,7 @@ async function handleExport() {
 }
 ```
 
-**`getFilenameFromContentDisposition`** [source](https://github.com/GreatAuk/axios-easy/blob/main/src/utils/getFilenameFromContentDisposition.ts)
+#### `getFilenameFromContentDisposition` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/utils/getFilenameFromContentDisposition.ts)
 
 从 `content-disposition` 响应头中安全地解析出文件名。支持 filename*=(RFC-5987) 和 filename= 格式。
 
@@ -871,7 +871,7 @@ console.log(`Header 4: ${getFilenameFromContentDisposition(header4)}`); // 输�
 console.log(`Header 5: ${getFilenameFromContentDisposition(header5)}`); // 输出: Header 5: semicolon;.txt
 ```
 
-**`saveAs(blob, fileName)`** [source](https://github.com/eligrey/FileSaver.js)
+#### `saveAs(blob, fileName)` [source](https://github.com/eligrey/FileSaver.js)
 
 重新导出了 `file-saver` 库的 `saveAs` 函数，方便实现文件下载，比简单的通过 a 标签下载兼容性更好。
 
