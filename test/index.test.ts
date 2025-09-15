@@ -3,7 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { createErrorMessageInterceptor, httpMessageMap } from '../src/error-message-interceptor';
+import { createErrorMessageInterceptor } from '../src/error-message-interceptor';
 import { createDefaultResponseInterceptor } from '../src/default-response-interceptor';
 
 type Response = {

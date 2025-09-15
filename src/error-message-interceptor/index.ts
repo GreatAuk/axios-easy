@@ -1,6 +1,7 @@
 import type { AxiosResponse, AxiosInstance } from 'axios';
 
 import { isCancel, isAxiosError } from 'axios';
+import { httpMessageMaps, getHttpStatusMsgMap, getGlobalLanguage, type SupportedLanguage } from './locale';
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
@@ -12,27 +13,19 @@ declare module 'axios' {
      * @default 'message'
      */
     errorMessageMode?: 'message' | 'modal' | 'none';
+    /**
+     * 错误信息语言
+     * - zh: 中文
+     * - en: 英文
+     * @default 'zh'
+     */
+    errorMessageLanguage?: SupportedLanguage;
   }
 }
 
-export const httpMessageMap = {
-  "requestTimeout": "请求超时，请稍后再试。",
-  "networkError": "网络异常，请检查您的网络连接后重试。",
-  "badRequest": "请求错误。请检查您的输入并重试。",
-  "unauthorized": "登录认证过期，请重新登录后继续。",
-  "forbidden": "禁止访问, 您没有权限访问此资源。",
-  "notFound": "未找到, 请求的资源不存在。",
-  "internalServerError": "内部服务器错误，请稍后再试。"
-};
-
-/** 4xx 状态码对应的错误信息 */
-const httpStatusMsgMap: Record<number, string> = {
-  400: httpMessageMap.badRequest,
-  401: httpMessageMap.unauthorized,
-  403: httpMessageMap.forbidden,
-  404: httpMessageMap.notFound,
-  408: httpMessageMap.requestTimeout,
-}
+// 导出类型和常量以便外部使用
+export type { SupportedLanguage };
+export { httpMessageMaps, httpMessageMapZH, setGlobalLanguage, getGlobalLanguage } from './locale';
 
 /** 自定义错误信息处理函数
  * @param errorMessage 错误信息, 在服务器返回4xx或5xx状态码，无法连接到服务器或CORS错误，请求超时的情况(axios 内部错误)，才有预置的错误信息，或者是空字符串
@@ -45,9 +38,14 @@ export type HandleErrorMessage = (error: AxiosResponse<any, any>, networkErrMsg:
  * 创建错误提示拦截器
  * @param axiosInstance axios 实例
  * @param handleErrorMessage 自定义错误信息处理函数
+ * @param defaultLanguage 默认语言，默认为中文。如果不提供，将使用全局语言设置
  * @returns 响应拦截器 ID, 用于移除拦截器
  */
-export function createErrorMessageInterceptor(axiosInstance: AxiosInstance, handleErrorMessage: HandleErrorMessage): number {
+export function createErrorMessageInterceptor(
+  axiosInstance: AxiosInstance,
+  handleErrorMessage: HandleErrorMessage,
+  defaultLanguage: SupportedLanguage = 'zh'
+): number {
   const responseInterceptorId = axiosInstance.interceptors.response.use(
     null,
     (error: any) => {
@@ -55,6 +53,15 @@ export function createErrorMessageInterceptor(axiosInstance: AxiosInstance, hand
       if (isCancel(error)) {
         return Promise.reject(error);
       }
+
+      // 语言优先级：请求配置 > 全局语言设置 > createErrorMessageInterceptor 拦截器默认语言
+      const requestLanguage = error?.config?.errorMessageLanguage as SupportedLanguage;
+      const fallbackLanguage = getGlobalLanguage() || defaultLanguage;
+      const language: SupportedLanguage = (requestLanguage && httpMessageMaps[requestLanguage])
+        ? requestLanguage
+        : fallbackLanguage;
+      const messageMap = httpMessageMaps[language];
+      const httpStatusMsgMap = getHttpStatusMsgMap(language);
 
       let networkErrMsg = '';
 
@@ -66,15 +73,15 @@ export function createErrorMessageInterceptor(axiosInstance: AxiosInstance, hand
         networkErrMsg = status ? httpStatusMsgMap[status] : ''
 
         if (code === 'ECONNABORTED' || message?.includes?.('timeout')) {
-          networkErrMsg = httpMessageMap.requestTimeout;
+          networkErrMsg = messageMap.requestTimeout;
         }
 
         if (code === 'ERR_NETWORK' || message?.includes?.('Network Error')) {
-          networkErrMsg = httpMessageMap.networkError;
+          networkErrMsg = messageMap.networkError;
         }
 
         if (!networkErrMsg) {
-          networkErrMsg = httpMessageMap.networkError;
+          networkErrMsg = messageMap.networkError;
         }
       }
 

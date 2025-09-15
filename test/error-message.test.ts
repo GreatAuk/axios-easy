@@ -3,7 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { createErrorMessageInterceptor, httpMessageMap } from '../src/error-message-interceptor';
+import { createErrorMessageInterceptor, httpMessageMapZH, httpMessageMaps, setGlobalLanguage, getGlobalLanguage } from '../src/error-message-interceptor';
 
 describe('errorMessageResponseInterceptor', () => {
   const axiosInstance: AxiosInstance = axios.create()
@@ -16,7 +16,9 @@ describe('errorMessageResponseInterceptor', () => {
       axiosInstance.interceptors.response.eject(interceptorId);
       interceptorId = -1;
     }
-    vi.restoreAllMocks()
+    vi.restoreAllMocks();
+    // 重置全局语言设置
+    setGlobalLanguage(undefined);
   });
 
   describe('网络相关错误', () => {
@@ -32,7 +34,7 @@ describe('errorMessageResponseInterceptor', () => {
       mock.onGet('/api/pet/1').networkErrorOnce();
 
       await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
-      expect(capturedMsg).toBe(httpMessageMap.networkError);
+      expect(capturedMsg).toBe(httpMessageMapZH.networkError);
       // MockAdapter 可能不会设置具体的错误代码，我们只验证错误消息匹配即可
       expect(capturedError).toBeDefined();
       expect(capturedError.message).toContain('Network Error');
@@ -50,7 +52,7 @@ describe('errorMessageResponseInterceptor', () => {
       mock.onGet('/api/pet/1').timeoutOnce();
 
       await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
-      expect(capturedMsg).toBe(httpMessageMap.requestTimeout);
+      expect(capturedMsg).toBe(httpMessageMapZH.requestTimeout);
       expect(capturedError.code).toBe('ECONNABORTED');
     });
 
@@ -72,7 +74,7 @@ describe('errorMessageResponseInterceptor', () => {
       });
 
       await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
-      expect(capturedMsg).toBe(httpMessageMap.requestTimeout);
+      expect(capturedMsg).toBe(httpMessageMapZH.requestTimeout);
     });
   });
 
@@ -87,7 +89,7 @@ describe('errorMessageResponseInterceptor', () => {
       mock.onGet('/api/pet/1').reply(400, { message: 'Bad Request' });
 
       await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
-      expect(capturedMsg).toBe(httpMessageMap.badRequest);
+      expect(capturedMsg).toBe(httpMessageMapZH.badRequest);
     });
 
     it('应该处理401错误 - 未授权', async () => {
@@ -100,7 +102,7 @@ describe('errorMessageResponseInterceptor', () => {
       mock.onGet('/api/pet/1').reply(401, { message: 'Unauthorized' });
 
       await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
-      expect(capturedMsg).toBe(httpMessageMap.unauthorized);
+      expect(capturedMsg).toBe(httpMessageMapZH.unauthorized);
     });
 
     it('应该处理403错误 - 禁止访问', async () => {
@@ -113,7 +115,7 @@ describe('errorMessageResponseInterceptor', () => {
       mock.onGet('/api/pet/1').reply(403, { message: 'Forbidden' });
 
       await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
-      expect(capturedMsg).toBe(httpMessageMap.forbidden);
+      expect(capturedMsg).toBe(httpMessageMapZH.forbidden);
     });
 
     it('应该处理404错误 - 未找到', async () => {
@@ -126,7 +128,7 @@ describe('errorMessageResponseInterceptor', () => {
       mock.onGet('/api/pet/1').reply(404, { message: 'Not Found' });
 
       await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
-      expect(capturedMsg).toBe(httpMessageMap.notFound);
+      expect(capturedMsg).toBe(httpMessageMapZH.notFound);
     });
 
     it('应该处理408错误 - 请求超时', async () => {
@@ -139,7 +141,7 @@ describe('errorMessageResponseInterceptor', () => {
       mock.onGet('/api/pet/1').reply(408, { message: 'Request Timeout' });
 
       await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
-      expect(capturedMsg).toBe(httpMessageMap.requestTimeout);
+      expect(capturedMsg).toBe(httpMessageMapZH.requestTimeout);
     });
 
     it('应该处理500错误 - 内部服务器错误', async () => {
@@ -152,7 +154,7 @@ describe('errorMessageResponseInterceptor', () => {
       mock.onGet('/api/pet/1').reply(500, { message: 'Internal Server Error' });
 
       await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
-      expect(capturedMsg).toBe(httpMessageMap.networkError);
+      expect(capturedMsg).toBe(httpMessageMapZH.networkError);
     });
 
     it('应该处理未映射的状态码', async () => {
@@ -165,7 +167,7 @@ describe('errorMessageResponseInterceptor', () => {
       mock.onGet('/api/pet/1').reply(502, { message: 'Bad Gateway' });
 
       await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
-      expect(capturedMsg).toBe(httpMessageMap.networkError);
+      expect(capturedMsg).toBe(httpMessageMapZH.networkError);
     });
   });
 
@@ -250,7 +252,7 @@ describe('errorMessageResponseInterceptor', () => {
       });
 
       await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
-      expect(capturedMsg).toBe(httpMessageMap.requestTimeout);
+      expect(capturedMsg).toBe(httpMessageMapZH.requestTimeout);
     });
 
     it('应该处理包含Network Error关键字的错误消息', async () => {
@@ -271,7 +273,7 @@ describe('errorMessageResponseInterceptor', () => {
       });
 
       await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
-      expect(capturedMsg).toBe(httpMessageMap.networkError);
+      expect(capturedMsg).toBe(httpMessageMapZH.networkError);
     });
   });
 
@@ -289,7 +291,7 @@ describe('errorMessageResponseInterceptor', () => {
 
       await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
 
-      expect(capturedMsg).toBe(httpMessageMap.notFound);
+      expect(capturedMsg).toBe(httpMessageMapZH.notFound);
       expect(capturedError).toBeDefined();
       expect(capturedError.response.status).toBe(404);
     });
@@ -306,8 +308,315 @@ describe('errorMessageResponseInterceptor', () => {
       expect(mockHandler).toHaveBeenCalledTimes(1);
       expect(mockHandler).toHaveBeenCalledWith(
         expect.any(Object),
-        httpMessageMap.networkError,
+        httpMessageMapZH.networkError,
       );
+    });
+  });
+
+  describe('国际化功能', () => {
+    it('应该支持默认中文错误信息', async () => {
+      let capturedMsg = '';
+
+      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
+        capturedMsg = networkErrMsg;
+      })
+
+      mock.onGet('/api/pet/1').reply(400, { message: 'Bad Request' });
+
+      await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
+      expect(capturedMsg).toBe(httpMessageMaps.zh.badRequest);
+    });
+
+    it('应该支持通过默认语言参数设置英文', async () => {
+      let capturedMsg = '';
+
+      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
+        capturedMsg = networkErrMsg;
+      }, 'en')
+
+      mock.onGet('/api/pet/1').reply(400, { message: 'Bad Request' });
+
+      await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
+      expect(capturedMsg).toBe(httpMessageMaps.en.badRequest);
+    });
+
+    it('应该支持通过请求配置设置语言', async () => {
+      let capturedMsg = '';
+
+      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
+        capturedMsg = networkErrMsg;
+      })
+
+      mock.onGet('/api/pet/1').reply(401, { message: 'Unauthorized' });
+
+      await expect(
+        axiosInstance.get('/api/pet/1', { errorMessageLanguage: 'en' })
+      ).rejects.toThrow();
+
+      expect(capturedMsg).toBe(httpMessageMaps.en.unauthorized);
+    });
+
+    it('请求配置的语言应该优先于默认语言', async () => {
+      let capturedMsg = '';
+
+      // 默认设置为英文
+      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
+        capturedMsg = networkErrMsg;
+      }, 'en')
+
+      mock.onGet('/api/pet/1').reply(403, { message: 'Forbidden' });
+
+      // 请求中设置为中文，应该优先使用中文
+      await expect(
+        axiosInstance.get('/api/pet/1', { errorMessageLanguage: 'zh' })
+      ).rejects.toThrow();
+
+      expect(capturedMsg).toBe(httpMessageMaps.zh.forbidden);
+    });
+
+    it('应该正确处理网络错误的多语言', async () => {
+      let capturedMsg = '';
+
+      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
+        capturedMsg = networkErrMsg;
+      }, 'en')
+
+      mock.onGet('/api/pet/1').networkErrorOnce();
+
+      await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
+      expect(capturedMsg).toBe(httpMessageMaps.en.networkError);
+    });
+
+    it('应该正确处理超时错误的多语言', async () => {
+      let capturedMsg = '';
+
+      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
+        capturedMsg = networkErrMsg;
+      }, 'en')
+
+      mock.onGet('/api/pet/1').timeoutOnce();
+
+      await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
+      expect(capturedMsg).toBe(httpMessageMaps.en.requestTimeout);
+    });
+
+    it('应该测试所有状态码的中英文错误信息', async () => {
+      const statusCodes = [400, 401, 403, 404, 408];
+      const messageKeys = ['badRequest', 'unauthorized', 'forbidden', 'notFound', 'requestTimeout'];
+
+      for (let i = 0; i < statusCodes.length; i++) {
+        const statusCode = statusCodes[i];
+        const messageKey = messageKeys[i];
+
+        // 测试中文
+        let capturedMsgZh = '';
+        interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
+          capturedMsgZh = networkErrMsg;
+        }, 'zh');
+
+        mock.onGet(`/api/test/${statusCode}`).reply(statusCode, { message: 'Error' });
+
+        await expect(axiosInstance.get(`/api/test/${statusCode}`)).rejects.toThrow();
+        expect(capturedMsgZh).toBe(httpMessageMaps.zh[messageKey]);
+
+        // 清理拦截器
+        axiosInstance.interceptors.response.eject(interceptorId);
+
+        // 测试英文
+        let capturedMsgEn = '';
+        interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
+          capturedMsgEn = networkErrMsg;
+        }, 'en');
+
+        mock.onGet(`/api/test-en/${statusCode}`).reply(statusCode, { message: 'Error' });
+
+        await expect(axiosInstance.get(`/api/test-en/${statusCode}`)).rejects.toThrow();
+        expect(capturedMsgEn).toBe(httpMessageMaps.en[messageKey]);
+
+        // 清理拦截器
+        axiosInstance.interceptors.response.eject(interceptorId);
+        interceptorId = -1;
+      }
+    });
+
+    it('应该处理无效语言类型时回退到默认语言', async () => {
+      let capturedMsg = '';
+
+      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
+        capturedMsg = networkErrMsg;
+      })
+
+      mock.onGet('/api/pet/1').reply(404, { message: 'Not Found' });
+
+      // 设置无效的语言类型，应该回退到默认的中文
+      await expect(
+        axiosInstance.get('/api/pet/1', { errorMessageLanguage: 'invalid' as any })
+      ).rejects.toThrow();
+
+      // 由于无效语言会导致 httpMessageMaps[language] 为 undefined，
+      // 应该使用默认语言的错误信息
+      expect(capturedMsg).toBe(httpMessageMaps.zh.notFound);
+    });
+  });
+
+  describe('全局语言管理', () => {
+    it('应该支持获取和设置全局语言', () => {
+      // 默认应该是中文
+      expect(getGlobalLanguage()).toBeUndefined();
+
+      // 设置为英文
+      setGlobalLanguage('en');
+      expect(getGlobalLanguage()).toBe('en');
+
+      // 重新设置为中文
+      setGlobalLanguage('zh');
+      expect(getGlobalLanguage()).toBe('zh');
+    });
+
+    it('拦截器应该使用全局语言设置', async () => {
+      let capturedMsg = '';
+
+      // 设置全局语言为英文
+      setGlobalLanguage('en');
+
+      // 创建拦截器时不指定默认语言，应该使用全局语言
+      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
+        capturedMsg = networkErrMsg;
+      });
+
+      mock.onGet('/api/pet/1').reply(400, { message: 'Bad Request' });
+
+      await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
+      expect(capturedMsg).toBe(httpMessageMaps.en.badRequest);
+    });
+
+    it('全局语言应该优先于拦截器默认语言', async () => {
+      let capturedMsg = '';
+
+      // 设置全局语言为英文
+      setGlobalLanguage('en');
+
+      // 创建拦截器时指定默认语言为中文，应该优先使用中文
+      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
+        capturedMsg = networkErrMsg;
+      }, 'zh');
+
+      mock.onGet('/api/pet/1').reply(401, { message: 'Unauthorized' });
+
+      await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
+      expect(capturedMsg).toBe(httpMessageMaps.en.unauthorized);
+    });
+
+    it('请求配置语言应该优先于拦截器默认语言和全局语言', async () => {
+      let capturedMsg = '';
+
+      // 设置全局语言为中文
+      setGlobalLanguage('zh');
+
+      // 创建拦截器时指定默认语言为英文
+      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
+        capturedMsg = networkErrMsg;
+      }, 'en');
+
+      mock.onGet('/api/pet/1').reply(403, { message: 'Forbidden' });
+
+      // 请求中设置语言为中文，应该优先使用中文
+      await expect(
+        axiosInstance.get('/api/pet/1', { errorMessageLanguage: 'zh' })
+      ).rejects.toThrow();
+
+      expect(capturedMsg).toBe(httpMessageMaps.zh.forbidden);
+    });
+
+    it('应该支持动态切换全局语言', async () => {
+      let capturedMsg = '';
+
+      // 初始设置为中文
+      setGlobalLanguage('zh');
+
+      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
+        capturedMsg = networkErrMsg;
+      });
+
+      // 第一次请求使用中文
+      mock.onGet('/api/test/1').reply(404, { message: 'Not Found' });
+      await expect(axiosInstance.get('/api/test/1')).rejects.toThrow();
+      expect(capturedMsg).toBe(httpMessageMaps.zh.notFound);
+
+      // 动态切换到英文
+      setGlobalLanguage('en');
+
+      // 第二次请求应该使用英文
+      mock.onGet('/api/test/2').reply(404, { message: 'Not Found' });
+      await expect(axiosInstance.get('/api/test/2')).rejects.toThrow();
+      expect(capturedMsg).toBe(httpMessageMaps.en.notFound);
+    });
+
+    it('全局语言切换应该影响所有未指定默认语言的拦截器', async () => {
+      let capturedMsg1 = '';
+      let capturedMsg2 = '';
+
+      // 创建两个拦截器，都不指定默认语言
+      const interceptorId1 = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
+        capturedMsg1 = networkErrMsg;
+      });
+
+      const axiosInstance2 = axios.create();
+      const mock2 = new MockAdapter(axiosInstance2);
+      const interceptorId2 = createErrorMessageInterceptor(axiosInstance2, (error, networkErrMsg) => {
+        capturedMsg2 = networkErrMsg;
+      });
+
+      // 设置全局语言为英文
+      setGlobalLanguage('en');
+
+      // 两个实例都应该使用英文
+      mock.onGet('/api/test1').reply(400, { message: 'Bad Request' });
+      mock2.onGet('/api/test2').reply(401, { message: 'Unauthorized' });
+
+      await expect(axiosInstance.get('/api/test1')).rejects.toThrow();
+      await expect(axiosInstance2.get('/api/test2')).rejects.toThrow();
+
+      expect(capturedMsg1).toBe(httpMessageMaps.en.badRequest);
+      expect(capturedMsg2).toBe(httpMessageMaps.en.unauthorized);
+
+      // 清理
+      axiosInstance.interceptors.response.eject(interceptorId1);
+      axiosInstance2.interceptors.response.eject(interceptorId2);
+      mock2.restore();
+      interceptorId = -1; // 防止 afterEach 重复清理
+    });
+
+    it('全局语言设置应该支持网络错误', async () => {
+      let capturedMsg = '';
+
+      // 设置全局语言为英文
+      setGlobalLanguage('en');
+
+      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
+        capturedMsg = networkErrMsg;
+      });
+
+      mock.onGet('/api/pet/1').networkErrorOnce();
+
+      await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
+      expect(capturedMsg).toBe(httpMessageMaps.en.networkError);
+    });
+
+    it('全局语言设置应该支持超时错误', async () => {
+      let capturedMsg = '';
+
+      // 设置全局语言为英文
+      setGlobalLanguage('en');
+
+      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
+        capturedMsg = networkErrMsg;
+      });
+
+      mock.onGet('/api/pet/1').timeoutOnce();
+
+      await expect(axiosInstance.get('/api/pet/1')).rejects.toThrow();
+      expect(capturedMsg).toBe(httpMessageMaps.en.requestTimeout);
     });
   });
 });
