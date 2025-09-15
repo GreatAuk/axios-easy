@@ -144,5 +144,58 @@ describe('defaultRequestInterceptor', () => {
       // 未 trim，因此 b 保留空白；a 原本就是空字符串，按全局 emptyStringToNull 转为 null
       expect(newConfig.data).toEqual({ a: null, b: ' text ' });
     });
+
+    it('应同时处理 params 和 data（全局配置生效）', () => {
+      interceptorId = createDefaultRequestInterceptor(axiosInstance, {
+        extendTimeoutWhenDownload: false,
+        normalizePayload: { trim: true, dropUndefined: true },
+      });
+      const handler = (axiosInstance.interceptors.request as any).handlers[interceptorId]?.fulfilled as (cfg: any) => any;
+
+      const config = {
+        timeout: 1000,
+        data: { dataField: ' data value ', x: undefined },
+        params: { paramField: ' param value ', y: undefined },
+      } as any;
+      const newConfig = handler(config);
+
+      expect(newConfig.data).toEqual({ dataField: 'data value' });
+      expect(newConfig.params).toEqual({ paramField: 'param value' });
+    });
+
+    it('当全局和请求级配置都为空时不应处理', () => {
+      interceptorId = createDefaultRequestInterceptor(axiosInstance, {
+        extendTimeoutWhenDownload: false,
+        // 不设置 normalizePayload
+      });
+      const handler = (axiosInstance.interceptors.request as any).handlers[interceptorId]?.fulfilled as (cfg: any) => any;
+
+      const config = {
+        timeout: 1000,
+        data: { s: ' a ', x: undefined },
+        // 不设置 normalizePayload
+      } as any;
+      const newConfig = handler(config);
+
+      expect(newConfig.data).toEqual({ s: ' a ', x: undefined });
+    });
+
+    it('请求级配置为空对象时应使用全局配置', () => {
+      interceptorId = createDefaultRequestInterceptor(axiosInstance, {
+        extendTimeoutWhenDownload: false,
+        normalizePayload: { trim: true, dropUndefined: true },
+      });
+      const handler = (axiosInstance.interceptors.request as any).handlers[interceptorId]?.fulfilled as (cfg: any) => any;
+
+      const config = {
+        timeout: 1000,
+        data: { s: ' a ', x: undefined },
+        normalizePayload: {}, // 空对象
+      } as any;
+      const newConfig = handler(config);
+
+      // 应该使用全局配置
+      expect(newConfig.data).toEqual({ s: 'a' });
+    });
   })
 });
