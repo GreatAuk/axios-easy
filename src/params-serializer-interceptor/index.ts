@@ -24,11 +24,8 @@ declare module 'axios' {
     /**
      * [createParamsSerializerInterceptor] 请求级别的数组参数序列化格式
      *
-     * 当设置此属性时，会覆盖拦截器的全局配置，仅对当前请求生效。
-     *
      * @example
      * ```typescript
-     * // 覆盖全局配置，本次请求使用 comma 格式
      * axiosInstance.get('/api/data', {
      *   params: { tags: ['a', 'b'] },
      *   qsStringifyArrayFormat: 'comma' // tags=a,b
@@ -41,6 +38,14 @@ declare module 'axios' {
 
 /**
  * 创建参数序列化请求拦截器
+ * @param axiosInstance - axios 实例
+ * @param options - 拦截器配置选项（可选）
+ * @param options.qsStringifyArrayFormat - 全局数组参数序列化格式
+ *   - 'brackets': arr[]=1&arr[]=2
+ *   - 'indices': arr[0]=1&arr[1]=2 (qs 库默认格式)
+ *   - 'repeat': arr=1&arr=2
+ *   - 'comma': arr=1,2
+ * @returns 请求拦截器 ID，用于移除拦截器
  *
  * 使用 qs 库对请求参数进行序列化，特别适用于需要发送 application/x-www-form-urlencoded 格式数据的场景。
  *
@@ -127,15 +132,6 @@ declare module 'axios' {
  * // 6. 移除拦截器
  * axiosInstance.interceptors.request.eject(interceptorId);
  * ```
- *
- * @param axiosInstance - axios 实例
- * @param options - 拦截器配置选项（可选）
- * @param options.qsStringifyArrayFormat - 全局数组参数序列化格式
- *   - 'brackets': arr[]=1&arr[]=2
- *   - 'indices': arr[0]=1&arr[1]=2 (qs 库默认格式)
- *   - 'repeat': arr=1&arr=2
- *   - 'comma': arr=1,2
- * @returns 请求拦截器 ID，用于移除拦截器
  */
 export const createParamsSerializerInterceptor = (axiosInstance: AxiosInstance, options?: ParamsSerializerInterceptorOptions): number => {
   const { qsStringifyArrayFormat } = options || {};

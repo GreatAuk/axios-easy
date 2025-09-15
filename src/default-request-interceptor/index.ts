@@ -27,14 +27,16 @@ export type DefaultRequestInterceptorOptions = {
 /**
  * 默认请求拦截器
  * @param options.extendTimeoutWhenDownload - 下载文件时，是否延长超时时间, 默认值为 true
+ * @param options.normalizePayload - 全局请求负载规范化选项
  * @returns 拦截器 ID, 用于移除拦截器
  */
 export const createDefaultRequestInterceptor = (axiosInstance: AxiosInstance, {
   extendTimeoutWhenDownload = true,
-}: DefaultRequestInterceptorOptions): number => {
+  normalizePayload: globalNormalizePayload,
+}: DefaultRequestInterceptorOptions = {}): number => {
 
   const requestInterceptorId = axiosInstance.interceptors.request.use((config) => {
-    const { responseType, normalizePayload } = config;
+    const { responseType, normalizePayload: requestNormalizePayload } = config;
 
     // 如果开启了下载延长超时功能，则在请求阶段检查 responseType
     // 当 responseType 为 'blob' 或 'arraybuffer' 时，且当前请求没有单独设置 timeout 时，将当前请求的 timeout 扩大 10 倍
@@ -48,11 +50,17 @@ export const createDefaultRequestInterceptor = (axiosInstance: AxiosInstance, {
 
 
     // 规范化请求体 payload（对象/数组）
+    // 合并全局配置与请求级配置，请求级配置优先
+    const mergedNormalizePayload = {
+      ...globalNormalizePayload,
+      ...requestNormalizePayload,
+    };
+
     const {
       trim = false,
       dropUndefined = false,
       emptyStringToNull = false,
-    } = normalizePayload || {};
+    } = mergedNormalizePayload;
 
     if (trim || dropUndefined || emptyStringToNull) {
       // 规范化 body 数据

@@ -108,4 +108,41 @@ describe('defaultRequestInterceptor', () => {
       expect(newConfig.data).toEqual({ a: null, b: null, c: 'text' });
     });
   })
+
+  describe('global normalizePayload + merge', () => {
+    it('应应用全局 normalizePayload（当请求未设置时）', () => {
+      interceptorId = createDefaultRequestInterceptor(axiosInstance, {
+        extendTimeoutWhenDownload: false,
+        normalizePayload: { trim: true, dropUndefined: true },
+      });
+      const handler = (axiosInstance.interceptors.request as any).handlers[interceptorId]?.fulfilled as (cfg: any) => any;
+
+      const config = {
+        timeout: 1000,
+        data: { s: ' a ', x: undefined, arr: [' b ', undefined] },
+      } as any;
+      const newConfig = handler(config);
+
+      expect(newConfig.data).toEqual({ s: 'a', arr: ['b'] });
+    });
+
+    it('请求级设置应覆盖全局（merge 行为）', () => {
+      interceptorId = createDefaultRequestInterceptor(axiosInstance, {
+        extendTimeoutWhenDownload: false,
+        normalizePayload: { trim: true, emptyStringToNull: true },
+      });
+      const handler = (axiosInstance.interceptors.request as any).handlers[interceptorId]?.fulfilled as (cfg: any) => any;
+
+      const config = {
+        timeout: 1000,
+        data: { a: '', b: ' text ' },
+        // 覆盖全局的 trim=true 为 false，但沿用全局 emptyStringToNull=true
+        normalizePayload: { trim: false },
+      } as any;
+      const newConfig = handler(config);
+
+      // 未 trim，因此 b 保留空白；a 原本就是空字符串，按全局 emptyStringToNull 转为 null
+      expect(newConfig.data).toEqual({ a: null, b: ' text ' });
+    });
+  })
 });

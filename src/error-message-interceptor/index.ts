@@ -3,6 +3,10 @@ import type { AxiosResponse, AxiosInstance } from 'axios';
 import { isCancel, isAxiosError } from 'axios';
 import { httpMessageMaps, getHttpStatusMsgMap, getGlobalLanguage, type SupportedLanguage } from './locale';
 
+// 导出类型和常量以便外部使用
+export type { SupportedLanguage };
+export { httpMessageMaps, httpMessageMapZH, setGlobalLanguage, getGlobalLanguage } from './locale';
+
 declare module 'axios' {
   export interface AxiosRequestConfig {
     /**
@@ -22,10 +26,6 @@ declare module 'axios' {
     errorMessageLanguage?: SupportedLanguage;
   }
 }
-
-// 导出类型和常量以便外部使用
-export type { SupportedLanguage };
-export { httpMessageMaps, httpMessageMapZH, setGlobalLanguage, getGlobalLanguage } from './locale';
 
 /** 自定义错误信息处理函数
  * @param errorMessage 错误信息, 在服务器返回4xx或5xx状态码，无法连接到服务器或CORS错误，请求超时的情况(axios 内部错误)，才有预置的错误信息，或者是空字符串
