@@ -14,7 +14,7 @@
   <br>
 </p>
 
-`axios-easy` 是一个为 [axios](https://axios-http.com/) 设计的轻量级工具函数库。它通过提供一系列即插即用的 `axios` 拦截器(没有其他黑科技)，帮助你优雅地处理请求和响应的通用逻辑，让你的代码更整洁、更易于维护。
+`axios-easy` 是一个模块化的 `TypeScript` 库，它通过一系列可组合的拦截器和实用程序扩展了 `axios` ，以标准化 `HTTP` 请求/响应处理。该库提供了即插即用的拦截器，用于处理常见的 `Web` 应用程序问题，包括身份验证、错误处理、负载规范化、参数序列化和文件处理。。
 
 ## 目录
 
@@ -98,13 +98,13 @@ graph TD
 import type { AxiosError, AxiosResponse } from 'axios';
 import axios from 'axios';
 
-// 从各个模块按需导入拦截器创建函数
+// 从各个模块按需导入你需要的拦截器创建函数
 import { createDefaultRequestInterceptor } from 'axios-easy/default-request-interceptor';
 import { createDefaultResponseInterceptor } from 'axios-easy/default-response-interceptor';
 import { createAuthenticateInterceptor } from 'axios-easy/authenticate-interceptor';
 import { createErrorMessageInterceptor } from 'axios-easy/error-message-interceptor';
 
-// 这个一般不需要使用，用于发送 application/x-www-form-urlencoded 格式的数据。一般默认的 JSON 数据（这也是现代 Web 开发中最常见的）就可以了。
+// 使用 qs 库对请求参数进行序列化，这个一般不需要使用，用于发送 application/x-www-form-urlencoded 格式的数据。默认的 application/json 数据（这也是现代 Web 开发中最常见的）就可以了。
 // import { createParamsSerializerInterceptor } from 'axios-easy/params-serializer-interceptor';
 
 // 请求重试功能，如果使用，请安装 axios-retry
@@ -161,7 +161,7 @@ createDefaultRequestInterceptor(axiosInstance, {
   },
 });
 
-// 应用默认响应拦截器 (主要处理数据结构)
+// 应用默认响应拦截器 (主要处理 response 数据结构)
 createDefaultResponseInterceptor(axiosInstance, {
   codeField: 'resultCode',
   dataField: 'data',
@@ -198,7 +198,7 @@ createAuthenticateInterceptor(axiosInstance, {
 // })
 
 // 应用错误消息拦截器 (统一错误提示, 在这里定义业务错误提示)
-createErrorMessageInterceptor(axiosInstance, (error: AxiosResponse<ApiResponse<any>>, networkErrMsg) => {
+createErrorMessageInterceptor(axiosInstance, (error: AxiosResponse<ApiResponse<any>>, networkErrMsg, 'zh') => {
   const { data, config } = error;
 
   // 如果单独配置了不提示错误信息，则直接返回
