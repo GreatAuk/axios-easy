@@ -734,69 +734,6 @@ axiosInstance.interceptors.request.eject(interceptorId);
 
 提供一些在网络请求中非常实用的辅助函数。
 
-#### `normalizeRequestPayload(payload, options)` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/utils/normalizeRequestPayload.ts)
-
-规范化请求负载（对象/数组），便于在发起请求前统一清洗数据。
-
-- 字符串 trim：默认启用，去除首尾空白。
-- 删除 undefined：可选，删除对象中值为 `undefined` 的键，且会从数组中移除 `undefined` 元素。
-- 空串转 null：可选，将空字符串（trim 后为空）转换为 `null`。
-- 安全类型：不会修改非普通对象，如 `Date`、`FormData`、`Blob`、`File`、`URLSearchParams`、`Buffer`、`Stream` 等。
-
-配置选项 (`NormalizeRequestPayloadOptions`):
-
-```ts
-export type NormalizeRequestPayloadOptions = {
-  /** 是否去除字符串首尾空白字符 @default true */
-  trim?: boolean;
-  /** 是否删除值为 undefined 的键 @default false */
-  dropUndefined?: boolean;
-  /** 是否将空字符串转换为 null @default false */
-  emptyStringToNull?: boolean;
-};
-```
-
-使用示例：
-
-```ts
-import { normalizeRequestPayload } from 'axios-easy/utils';
-
-// 1) 默认行为：仅 trim 字符串，不删除 undefined
-const input1 = { name: ' Alice  ', nick: undefined, arr: [' a ', 'b', undefined] };
-normalizeRequestPayload(input1);
-// => { name: 'Alice', nick: undefined, arr: ['a', 'b', undefined] }
-
-// 2) 删除 undefined（对象键与数组元素）
-normalizeRequestPayload(input1, { dropUndefined: true });
-// => { name: 'Alice', arr: ['a', 'b'] }
-
-// 3) 空字符串转为 null（基于 trim 后判断）
-normalizeRequestPayload({ a: '  ', b: '', c: ' x ' }, { emptyStringToNull: true });
-// => { a: null, b: null, c: 'x' }
-
-// 4) 结合 axios 使用（对 data 与 params 同步清洗）
-axiosInstance.interceptors.request.use((config) => {
-  if (config.data && typeof config.data === 'object' && !(config.data instanceof FormData)) {
-    config.data = normalizeRequestPayload(config.data, {
-      trim: true,
-      dropUndefined: true,
-      emptyStringToNull: true,
-    });
-  }
-  if (config.params && typeof config.params === 'object') {
-    config.params = normalizeRequestPayload(config.params, {
-      trim: true,
-      dropUndefined: true,
-      emptyStringToNull: true,
-    });
-  }
-  return config;
-});
-
-// 提示：JSON.stringify 对象属性为 undefined 会被省略，数组中的 undefined 会被序列化为 null；
-// 若希望“移除”数组中的 undefined，请使用 dropUndefined: true。
-```
-
 #### `processFileStream(response, options)` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/utils/processFileStream.ts)
 
 处理文件下载流的核心函数。它能智能判断响应是文件流还是包含错误信息的 JSON。
@@ -892,6 +829,69 @@ const canvas = document.getElementById("my-canvas");
 canvas.toBlob(function(blob) {
   saveAs(blob, "pretty image.png");
 });
+```
+
+#### `normalizeRequestPayload(payload, options)` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/utils/normalizeRequestPayload.ts)
+
+规范化请求负载（对象/数组），便于在发起请求前统一清洗数据。
+
+- 字符串 trim：默认启用，去除首尾空白。
+- 删除 undefined：可选，删除对象中值为 `undefined` 的键，且会从数组中移除 `undefined` 元素。
+- 空串转 null：可选，将空字符串（trim 后为空）转换为 `null`。
+- 安全类型：不会修改非普通对象，如 `Date`、`FormData`、`Blob`、`File`、`URLSearchParams`、`Buffer`、`Stream` 等。
+
+配置选项 (`NormalizeRequestPayloadOptions`):
+
+```ts
+export type NormalizeRequestPayloadOptions = {
+  /** 是否去除字符串首尾空白字符 @default true */
+  trim?: boolean;
+  /** 是否删除值为 undefined 的键 @default false */
+  dropUndefined?: boolean;
+  /** 是否将空字符串转换为 null @default false */
+  emptyStringToNull?: boolean;
+};
+```
+
+使用示例：
+
+```ts
+import { normalizeRequestPayload } from 'axios-easy/utils';
+
+// 1) 默认行为：仅 trim 字符串，不删除 undefined
+const input1 = { name: ' Alice  ', nick: undefined, arr: [' a ', 'b', undefined] };
+normalizeRequestPayload(input1);
+// => { name: 'Alice', nick: undefined, arr: ['a', 'b', undefined] }
+
+// 2) 删除 undefined（对象键与数组元素）
+normalizeRequestPayload(input1, { dropUndefined: true });
+// => { name: 'Alice', arr: ['a', 'b'] }
+
+// 3) 空字符串转为 null（基于 trim 后判断）
+normalizeRequestPayload({ a: '  ', b: '', c: ' x ' }, { emptyStringToNull: true });
+// => { a: null, b: null, c: 'x' }
+
+// 4) 结合 axios 使用（对 data 与 params 同步清洗）
+axiosInstance.interceptors.request.use((config) => {
+  if (config.data && typeof config.data === 'object' && !(config.data instanceof FormData)) {
+    config.data = normalizeRequestPayload(config.data, {
+      trim: true,
+      dropUndefined: true,
+      emptyStringToNull: true,
+    });
+  }
+  if (config.params && typeof config.params === 'object') {
+    config.params = normalizeRequestPayload(config.params, {
+      trim: true,
+      dropUndefined: true,
+      emptyStringToNull: true,
+    });
+  }
+  return config;
+});
+
+// 提示：JSON.stringify 对象属性为 undefined 会被省略，数组中的 undefined 会被序列化为 null；
+// 若希望“移除”数组中的 undefined，请使用 dropUndefined: true。
 ```
 
 ## 搭配 [openapi-ts-request](https://github.com/openapi-ui/openapi-ts-request) 使用 [查看](https://github.com/GreatAuk/axios-easy/blob/main/openapi-ts-request.md)
