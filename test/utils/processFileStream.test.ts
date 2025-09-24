@@ -87,6 +87,18 @@ describe('processFileStream', () => {
     expect(fileName).toBe('custom.txt');
   });
 
+  it('缺少 content-disposition 但提供自定义文件名：应使用自定义文件名', async () => {
+    const blob = new Blob(['hello'], { type: 'text/plain' });
+    const res = createAxiosResponse(blob, undefined as any);
+
+    const ret = await processFileStream(res as any, { fileName: 'custom.txt' });
+
+    expect(ret).toBeUndefined();
+    expect(mockedSaveAs).toHaveBeenCalledTimes(1);
+    const [_, fileName] = mockedSaveAs.mock.calls[0];
+    expect(fileName).toBe('custom.txt');
+  });
+
   it('缺少 content-disposition 且非 json：应返回 "导出失败"', async () => {
     const blob = new Blob(['hello'], { type: 'text/plain' });
     const res = createAxiosResponse(blob);

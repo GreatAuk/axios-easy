@@ -50,15 +50,16 @@ export async function processFileStream(
 ) {
   try {
     const { errorMessageField = 'errorCodeDes', fileName: customFileName } = options || {};
-    const contentDisposition = res.headers['content-disposition'];
+    const contentDisposition = res.headers?.['content-disposition'];
     if (res.data.type === 'application/json') {
       const json = JSON.parse(await res.data.text());
       return (json[errorMessageField] as string) || '导出失败';
     }
-    if (!contentDisposition) {
+    const hasCustomFileName = Boolean(customFileName);
+    if (!contentDisposition && !hasCustomFileName) {
       throw new Error('下载接口 response header 未定义 content-disposition');
     }
-    const fileName = customFileName || getFilenameFromContentDisposition(contentDisposition);
+    const fileName = customFileName || getFilenameFromContentDisposition(contentDisposition ?? '');
 
     if (!fileName) {
       throw new Error('从 content-disposition 中获取文件名失败');
