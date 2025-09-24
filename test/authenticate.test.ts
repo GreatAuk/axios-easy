@@ -43,6 +43,28 @@ describe('authenticateResponseInterceptor', () => {
     expect(interceptorId).toBeGreaterThanOrEqual(0);
   });
 
+  it('enableRefreshToken 为 true 时未提供 doRefreshToken 应该抛出错误', () => {
+    expect(() => createAuthenticateInterceptor(axiosInstance, {
+      doReAuthenticate: vi.fn(),
+      enableRefreshToken: true,
+    })).toThrowError('[axios-easy] enableRefreshToken=true requires a valid doRefreshToken handler.');
+  });
+
+  it('enableRefreshToken 为 true 且 doRefreshToken 不是函数时应该抛出错误', () => {
+    expect(() => createAuthenticateInterceptor(axiosInstance, {
+      doReAuthenticate: vi.fn(),
+      enableRefreshToken: true,
+      doRefreshToken: {} as any,
+    })).toThrowError('[axios-easy] enableRefreshToken=true requires a valid doRefreshToken handler.');
+  });
+
+  it('enableRefreshToken 为 false 时允许省略 doRefreshToken', () => {
+    expect(() => createAuthenticateInterceptor(axiosInstance, {
+      doReAuthenticate: vi.fn(),
+      enableRefreshToken: false,
+    })).not.toThrow();
+  });
+
   it('当未开启 refreshToken 时, 登录失效应该调用 doReAuthenticate', async () => {
     const doReAuthenticate = vi.fn().mockResolvedValue(undefined);
 
