@@ -90,7 +90,7 @@ export const createDefaultResponseInterceptor = (axiosInstance: AxiosInstance, {
       }
 
       // 当接口返回 204 No Content、HEAD 请求或其它无正文响应时，data 可能为 undefined
-      if (typeof data === 'undefined') {
+      if (isUndefined(data)) {
         return data;
       }
 

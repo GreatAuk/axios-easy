@@ -5,13 +5,13 @@ import { isFunction } from '../util';
 
 export type AuthenticateInterceptorOptions = {
   /** 重新授权， 一般实现是跳转到登录页面 */
-  doReAuthenticate: (error: AxiosError) => Promise<void>;
+  doReAuthenticate: (error: AxiosError<any, any>) => Promise<void>;
   /** 是否开启 token 刷新功能 */
   enableRefreshToken: boolean;
   /** 刷新 token, 一般实现是调用后端接口刷新 token。如果失败，建议抛出异常，这样会触发 doReAuthenticate */
-  doRefreshToken?: (error: AxiosError) => Promise<any>;
+  doRefreshToken?: (error: AxiosError<any, any>) => Promise<any>;
   /** 判断是否登录失效，默认: 判断 401 状态码 */
-  isAuthenticateFailed?: (error: AxiosError) => boolean;
+  isAuthenticateFailed?: (error: AxiosError<any, any>) => boolean;
 };
 
 type PendingTask = {
@@ -50,7 +50,7 @@ export function createAuthenticateInterceptor(axiosInstance: AxiosInstance, {
 
   const responseInterceptorId = axiosInstance.interceptors.response.use(
     null,
-    async (error: AxiosError) => {
+    async (error: AxiosError<any, any>) => {
       const { config, response } = error;
 
       /** 判断是否登录失效 */

@@ -32,7 +32,7 @@ declare module 'axios' {
  * @param error 错误对象
  * @returns void
  */
-export type HandleErrorMessage = (error: AxiosResponse<any, any>, networkErrMsg: string) => void;
+export type HandleErrorMessage = (error: any, networkErrMsg: string) => void;
 
 /**
  * 创建错误提示拦截器
