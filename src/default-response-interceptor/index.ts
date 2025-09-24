@@ -1,6 +1,6 @@
 import type { AxiosInstance } from 'axios';
 
-import { isFunction } from '../util';
+import { isFunction, isUndefined } from '../util';
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
@@ -89,10 +89,16 @@ export const createDefaultResponseInterceptor = (axiosInstance: AxiosInstance, {
         return response;
       }
 
-      // 统一判断接口是否访问成功
+      // 当接口返回 204 No Content、HEAD 请求或其它无正文响应时，data 可能为 undefined
+      if (typeof data === 'undefined') {
+        return data;
+      }
+
+      const codeValue = (data as any)?.[codeField];
+
       const isSuccess = isFunction(successCode)
-        ? successCode(data[codeField])
-        : data[codeField] === successCode;
+        ? successCode(codeValue)
+        : codeValue === successCode;
 
       if (!isSuccess && isThrowWhenFail) {
         return Promise.reject(response)

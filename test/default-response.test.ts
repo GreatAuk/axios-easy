@@ -414,6 +414,34 @@ describe('defaultResponseInterceptor', () => {
       ).rejects.toThrow();
     });
 
+    it('响应状态为 204 且无响应体时应返回 undefined', async () => {
+      interceptorId = createDefaultResponseInterceptor(axiosInstance, {
+        codeField: 'resultCode',
+        dataField: 'data',
+        successCode: 'SUCCESS',
+        isThrowWhenFail: true,
+      })
+
+      mock.onGet('/api/no-content').reply(204);
+
+      await expect(axiosInstance.get('/api/no-content')).resolves.toBeUndefined();
+    });
+
+    it('响应状态为 204 且请求配置 responseReturn 为 data 时应返回 undefined', async () => {
+      interceptorId = createDefaultResponseInterceptor(axiosInstance, {
+        codeField: 'resultCode',
+        dataField: 'data',
+        successCode: 'SUCCESS',
+        isThrowWhenFail: true,
+      })
+
+      mock.onGet('/api/no-content-data').reply(204);
+
+      await expect(axiosInstance.get('/api/no-content-data', {
+        responseReturn: 'data'
+      })).resolves.toBeUndefined();
+    });
+
     it('空字符串作为 successCode', async () => {
       interceptorId = createDefaultResponseInterceptor(axiosInstance, {
         codeField: 'status',

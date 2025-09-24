@@ -6,9 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createDefaultRequestInterceptor } from '../src/default-request-interceptor';
 
 describe('defaultRequestInterceptor', () => {
-  const axiosInstance: AxiosInstance = axios.create({
-    responseReturn: 'body',
-  })
+  const axiosInstance: AxiosInstance = axios.create()
   let interceptorId: number = -1
   axiosInstance.defaults.timeout = 1000;
   const mock: MockAdapter = new MockAdapter(axiosInstance);
