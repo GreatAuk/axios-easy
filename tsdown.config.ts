@@ -11,6 +11,7 @@ export default defineConfig([
       'params-serializer-interceptor': './src/params-serializer-interceptor/index.ts',
       'utils': "./src/utils/index.ts",
       'openapi-ts-request-util': './src/openapi-ts-request-util.ts',
+      'extend-axios-type': './src/extend-axios-type.ts',
     },
     platform: 'neutral',
     dts: true,

@@ -56,6 +56,11 @@
       "types": "./dist/openapi-ts-request-util/index.d.ts",
       "import": "./dist/openapi-ts-request-util.js",
       "require": "./dist/openapi-ts-request-util.js"
+    },
+    "./extend-axios-type": {
+      "types": "./dist/extend-axios-type.d.ts",
+      "import": "./dist/extend-axios-type.d.ts",
+      "require": "./dist/extend-axios-type.d.ts"
     }
   },
   "publishConfig": {
