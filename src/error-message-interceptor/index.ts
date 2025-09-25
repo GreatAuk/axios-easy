@@ -1,4 +1,4 @@
-import type { AxiosInstance } from 'axios';
+import type { AxiosInstance, AxiosResponse } from 'axios';
 import type { SupportedLanguage } from './locale';
 
 import { isCancel, isAxiosError } from 'axios';
