@@ -3,7 +3,7 @@
  * @param contentDisposition content-disposition
  * @returns 文件名
  */
-export function getFilenameFromContentDisposition(contentDisposition: string) {
+export function getFilenameFromContentDisposition(contentDisposition: string): string | null {
   if (!contentDisposition) return null
 
   // 1. 优先尝试 RFC-5987 的 filename* 格式 (例如: filename*=UTF-8''%e2%82%ac%20rates.pdf)
@@ -25,7 +25,7 @@ export function getFilenameFromContentDisposition(contentDisposition: string) {
   return null;
 }
 
-function decodeFilename(filename: string) {
+function decodeFilename(filename: string): string {
   try {
     return decodeURIComponent(filename.replace(/\\"/g, '"').replace(/^"|"$/g, ''));
   } catch {

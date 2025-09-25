@@ -14,6 +14,9 @@ export default defineConfig([
       'extend-axios-type': './src/extend-axios-type.ts',
     },
     platform: 'neutral',
-    dts: true,
+    dts: {
+      sourcemap: true,
+    },
+    sourcemap: true
   },
 ])

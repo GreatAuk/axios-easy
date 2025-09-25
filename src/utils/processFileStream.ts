@@ -47,7 +47,7 @@ type Options = {
 export async function processFileStream(
   res: AxiosResponse<any>,
   options?: Options,
-) {
+): Promise<string | undefined> {
   try {
     const { errorMessageField = 'errorCodeDes', fileName: customFileName } = options || {};
     const contentDisposition = res.headers?.['content-disposition'];

@@ -11,6 +11,8 @@
     "types": [
       "node"
     ],
+    "declarationMap": true,
+    "isolatedDeclarations": true,
     "strict": true,
     "noUnusedLocals": true,
     "declaration": true,

@@ -37,7 +37,7 @@ export function getGlobalLanguage(): SupportedLanguage | undefined {
 }
 
 /** 向后兼容的中文错误信息映射 */
-export const httpMessageMapZH = httpMessageMaps.zh;
+export const httpMessageMapZH: Record<string, string> = httpMessageMaps.zh;
 
 /** 获取指定语言的状态码错误信息映射 */
 export function getHttpStatusMsgMap(language: SupportedLanguage = 'zh'): Record<number, string> {
