@@ -16,14 +16,17 @@ import { patchApiJSON, toUpperFirstLetter } from 'axios-easy/openapi-ts-request-
 /**
  * 通用的请求方法
  */
-function request<T>(
-  url: string,
-  config: AxiosRequestConfig,
-): Promise<T> {
-  return axiosInstance({
-    ...config,
-    url,
-  }) as Promise<T>
+export async function request<T>(url: string, config: AxiosRequestConfig) {
+  try {
+    const res = await axiosInstance({
+      ...config,
+      url,
+    });
+
+    return res as T;
+  } catch (error: any) {
+    throw error.response ? error.response.data : error;
+  }
 }
 ```
 

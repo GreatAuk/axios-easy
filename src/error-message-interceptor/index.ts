@@ -1,4 +1,4 @@
-import type { AxiosResponse, AxiosInstance } from 'axios';
+import type { AxiosInstance, AxiosResponse } from 'axios';
 
 import { isCancel, isAxiosError } from 'axios';
 import { httpMessageMaps, getHttpStatusMsgMap, getGlobalLanguage, type SupportedLanguage } from './locale';
@@ -14,7 +14,7 @@ declare module 'axios' {
      * - message: 使用 message 提示错误信息, 如 Element Plus 或 antdv 的 message.error
      * - modal: 使用 modal 提示错误信息, 如 antdv 的 Modal.error 或 Element Plus 的 ElMessage.error
      * - none: 不提示错误信息
-     * @default 'message'
+     * @default undefined
      */
     errorMessageMode?: 'message' | 'modal' | 'none';
     /**
@@ -32,7 +32,7 @@ declare module 'axios' {
  * @param error 错误对象
  * @returns void
  */
-export type HandleErrorMessage = (error: any, networkErrMsg: string) => void;
+export type HandleErrorMessage = (error: AxiosResponse, networkErrMsg: string) => void;
 
 /**
  * 创建错误提示拦截器

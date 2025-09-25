@@ -135,6 +135,7 @@ const AUTH_ERROR_CODES = [
 const axiosInstance = axios.create({
   baseURL: 'https://api.example.com',
   responseReturn: 'body',
+  errorMessageMode: 'message',
   timeout: 30 * 1000,
   headers: {
     'Content-Type': 'application/json;charset=utf-8',
@@ -202,8 +203,11 @@ createAuthenticateInterceptor(axiosInstance, {
 // })
 
 // 应用错误消息拦截器 (统一错误提示, 在这里定义业务错误提示)
-createErrorMessageInterceptor(axiosInstance, (error: AxiosResponse<ApiResponse<any>>, networkErrMsg) => {
-  const { data, config } = error;
+createErrorMessageInterceptor(axiosInstance, (errorResponse: AxiosResponse<ApiResponse<any>>, networkErrMsg) => {
+  if (!errorResponse.config || !errorResponse.data) {
+    return;
+  }
+  const { data, config } = errorResponse;
 
   // 如果单独配置了不提示错误信息，则直接返回
   if (config?.errorMessageMode === 'none') {
