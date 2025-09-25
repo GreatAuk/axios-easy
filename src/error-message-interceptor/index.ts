@@ -1,7 +1,8 @@
-import type { AxiosInstance, AxiosResponse } from 'axios';
+import type { AxiosInstance } from 'axios';
+import type { SupportedLanguage } from './locale';
 
 import { isCancel, isAxiosError } from 'axios';
-import { httpMessageMaps, getHttpStatusMsgMap, getGlobalLanguage, type SupportedLanguage } from './locale';
+import { httpMessageMaps, getHttpStatusMsgMap, getGlobalLanguage } from './locale';
 
 // 导出类型和常量以便外部使用
 export type { SupportedLanguage };
