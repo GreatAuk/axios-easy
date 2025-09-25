@@ -1,6 +1,6 @@
 {
   "name": "axios-easy",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "A simple axios library",
   "type": "module",
   "license": "MIT",
