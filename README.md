@@ -262,7 +262,7 @@ async function getUserInfo() {
 此拦截器用于优化请求行为。
 
 **功能**:
-- **下载场景下延长 timeout**: 当检测到请求是用于下载文件时（`responseType` 为 `'blob'` 或 `'arraybuffer'`），会自动延长该请求的超时时间（默认为基础超时时间的 10 倍），防止因文件过大导致下载超时。
+- **下载场景下延长 timeout**: 当检测到请求是用于下载文件时（`responseType` 为 `'blob'` 或 `'arraybuffer'`），会自动延长该请求的超时时间（默认为基础超时时间的 10 倍），防止因文件过大导致下载超时；如需更灵活的策略，可传入函数接收默认超时时间并返回定制值。
 - **请求参数规范化**: 支持在发送请求前对 `data` 和 `params` 进行统一的数据清洗，包括字符串 trim、删除 undefined 值、空字符串转 null 等操作。
 
 **配置选项 (`DefaultRequestInterceptorOptions`)**:
@@ -274,7 +274,7 @@ export type DefaultRequestInterceptorOptions = {
    * 是否自动延长请求的超时时间，以防止因文件过大导致下载超时。
    * @default true
    */
-  extendTimeoutWhenDownload?: boolean;
+  extendTimeoutWhenDownload?: boolean | ((defaultTimeout: number, config: InternalAxiosRequestConfig) => number);
   /**
    * 是否在请求前规范化传参（仅处理普通对象/数组）
    * - trim: 是否去除字符串首尾空白，默认 false
@@ -314,7 +314,7 @@ interface AxiosRequestConfig {
 import { createDefaultRequestInterceptor } from 'axios-easy/default-request-interceptor';
 
 createDefaultRequestInterceptor(axiosInstance, {
-  extendTimeoutWhenDownload: true, // 默认为 true，下载文件时自动延长超时时间，防止因文件过大导致下载超时
+  extendTimeoutWhenDownload: true, // 布尔值时沿用默认策略：下载请求且未单独设置 timeout 时，将默认超时时间放大 10 倍
   normalizePayload: {
     trim: true,           // 去除字符串首尾空白
     dropUndefined: true,  // 删除 undefined 值

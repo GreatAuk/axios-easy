@@ -29,6 +29,19 @@ describe('defaultRequestInterceptor', () => {
       expect(newConfig.timeout).toBe(10000);
     });
 
+    it('extendTimeoutWhenDownload 为函数时，应使用返回值作为新的 timeout', () => {
+      /** 自定义超时计算函数 */
+      const timeoutCalculator = vi.fn((defaultTimeout: number) => defaultTimeout + 5000);
+      interceptorId = createDefaultRequestInterceptor(axiosInstance, { extendTimeoutWhenDownload: timeoutCalculator });
+      const handler = (axiosInstance.interceptors.request as any).handlers[interceptorId]?.fulfilled as (cfg: any) => any;
+
+      const config = { timeout: 1000, responseType: 'arraybuffer' };
+      const newConfig = handler(config);
+
+      expect(timeoutCalculator).toHaveBeenCalledWith(1000);
+      expect(newConfig.timeout).toBe(6000);
+    });
+
     it('当 responseType 不是下载类型时不应修改 timeout', () => {
       interceptorId = createDefaultRequestInterceptor(axiosInstance, { extendTimeoutWhenDownload: true });
       const handler = (axiosInstance.interceptors.request as any).handlers[interceptorId]?.fulfilled as (cfg: any) => any;
