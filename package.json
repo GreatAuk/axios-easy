@@ -59,8 +59,8 @@
     },
     "./extend-axios-type": {
       "types": "./dist/extend-axios-type.d.ts",
-      "import": "./dist/extend-axios-type.d.ts",
-      "require": "./dist/extend-axios-type.d.ts"
+      "import": "./dist/extend-axios-type.js",
+      "require": "./dist/extend-axios-type.js"
     }
   },
   "publishConfig": {

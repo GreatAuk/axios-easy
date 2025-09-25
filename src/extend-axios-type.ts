@@ -60,4 +60,6 @@ declare module 'axios' {
   }
 }
 
-export { }
+export default {
+  name: 'extend-axios-type',
+}
