@@ -2,6 +2,8 @@ import type { AxiosInstance } from 'axios';
 
 import { isFunction, isUndefined } from '../util';
 
+export type ResponseReturn = 'body' | 'data' | 'raw';
+
 declare module 'axios' {
   export interface AxiosRequestConfig {
     /**
@@ -28,7 +30,7 @@ declare module 'axios' {
       }
      * ```
      */
-    responseReturn?: 'body' | 'data' | 'raw';
+    responseReturn?: ResponseReturn;
   }
 }
 

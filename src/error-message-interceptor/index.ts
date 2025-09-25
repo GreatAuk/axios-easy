@@ -6,6 +6,7 @@ import { httpMessageMaps, getHttpStatusMsgMap, getGlobalLanguage } from './local
 
 // 导出类型和常量以便外部使用
 export type { SupportedLanguage };
+export type ErrorMessageMode = 'message' | 'modal' | 'none';
 export { httpMessageMaps, httpMessageMapZH, setGlobalLanguage, getGlobalLanguage } from './locale';
 
 declare module 'axios' {
@@ -17,7 +18,7 @@ declare module 'axios' {
      * - none: 不提示错误信息
      * @default undefined
      */
-    errorMessageMode?: 'message' | 'modal' | 'none';
+    errorMessageMode?: ErrorMessageMode;
     /**
      * 错误信息语言
      * - zh: 中文

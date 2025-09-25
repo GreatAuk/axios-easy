@@ -3,6 +3,8 @@ import { normalizeRequestPayload } from '../utils';
 
 import type { NormalizeRequestPayloadOptions } from '../utils/normalizeRequestPayload';
 
+export type { NormalizeRequestPayloadOptions };
+
 declare module 'axios' {
   export interface AxiosRequestConfig {
     /**
