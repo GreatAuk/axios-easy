@@ -48,6 +48,8 @@ export type DefaultResponseInterceptorOptions = {
    */
   successCode: ((code: any) => boolean) | number | string;
   /** 是否在接口访问失败时(业务报错)抛出错误。 如 codeField 所指定的字段值与 successCode 不相同时，抛出错误
+   *
+   * 设置为 `true` 后，业务错误将进入 `catch` 块。
    * @default true
    */
   isThrowWhenFail?: boolean;

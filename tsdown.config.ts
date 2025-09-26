@@ -12,6 +12,7 @@ export default defineConfig([
       'utils': "./src/utils/index.ts",
       'openapi-ts-request-util': './src/openapi-ts-request-util.ts',
       'extend-axios-type': './src/extend-axios-type.ts',
+      'create-request-client': './src/create-request-client/index.ts',
     },
     platform: 'neutral',
     dts: {

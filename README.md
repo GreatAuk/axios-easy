@@ -23,6 +23,7 @@
 - [📊 请求流程图](#-请求流程图)
 - [🚀 快速上手](#-快速上手)
 - [📚 API 文档](#-api-文档)
+  - [`axios-easy/createRequestClient`](#axios-easycreaterequestclient-source)
   - [`axios-easy/default-request-interceptor`](#axios-easydefault-request-interceptor-source)
   - [`axios-easy/default-response-interceptor`](#axios-easydefault-response-interceptor-source)
   - [`axios-easy/error-message-interceptor`](#axios-easyerror-message-interceptor-source)
@@ -93,7 +94,9 @@ graph TD
     class 发起请求前,请求处理后 box
 ```
 
-## 🚀 快速上手
+## 🚀 快速上手方式一：
+
+**搭积木一样，根据你需要的拦截器按需导入。可定制程度较高，也更符合之前的编程习惯：创建 axios 实例，然后添加各种拦截器。**
 
 下面是一个集成了所有核心拦截器的示例，展示了 `axios-easy` 的使用方法，这是一个比较完整的示例，你简单修改后可以直接使用。
 
@@ -153,7 +156,7 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
-// 应用参数序列化拦截器 (可选，需要发送 form-urlencoded 数据时使用)
+// 应用参数序列化拦截器 (可选，需要发送 application/x-www-form-urlencoded 数据时使用)
 // createParamsSerializerInterceptor(axiosInstance, {
 //   qsStringifyArrayFormat: 'brackets' // 按需选择，不传也行，默认使用 indices 格式。
 // });
@@ -168,12 +171,12 @@ createDefaultRequestInterceptor(axiosInstance, {
   },
 });
 
-// 应用默认响应拦截器 (主要处理 response 数据结构)
+// 应用默认响应拦截器 (处理 response 数据结构)
 createDefaultResponseInterceptor(axiosInstance, {
   codeField: 'resultCode',
   dataField: 'data',
   successCode: 'SUCCESS',
-  isThrowWhenFail: true,
+  isThrowWhenFail: true,   // 当业务请求失败时（状态码不匹配 `successCode`），是否抛出错误。设置为 `true` 后，业务错误将进入 `catch` 块。
 });
 
 // 认证拦截器, 支持无感刷新 token。用于登录失效
@@ -205,37 +208,40 @@ createAuthenticateInterceptor(axiosInstance, {
 // })
 
 // 应用错误消息拦截器 (统一错误提示, 在这里定义业务错误提示)
-createErrorMessageInterceptor(axiosInstance, (errorResponse: AxiosResponse<ApiResponse<any>>, networkErrMsg) => {
-  if (!errorResponse.config || !errorResponse.data) {
-    return;
-  }
-  const { data, config } = errorResponse;
+createErrorMessageInterceptor(axiosInstance, {
+  handler: (errorResponse: AxiosResponse<ApiResponse<any>>, networkErrMsg) => {
+    if (!errorResponse.config || !errorResponse.data) {
+      return;
+    }
+    const { data, config } = errorResponse;
 
-  // 如果单独配置了不提示错误信息，则直接返回
-  if (config?.errorMessageMode === 'none') {
-    return;
-  }
+    // 如果单独配置了不提示错误信息，则直接返回
+    if (config?.errorMessageMode === 'none') {
+      return;
+    }
 
-  const errorMessage = data?.errorCodeDes || networkErrMsg || data?.errorCode || '未知错误';
+    const errorMessage = data?.errorCodeDes || networkErrMsg || data?.errorCode || '未知错误';
 
-  // 这里使用你项目中的 UI 组件库来显示错误，例如 Element Plus
-  if (config?.errorMessageMode === 'message') {
-    // 如果没有错误信息，则会根据状态码进行提示
-    ElMessage({
-      message: errorMessage,
-      type: 'error',
-      plain: true,
-      grouping: true,
-    });
-  } else if (config?.errorMessageMode === 'modal') {
-    ElMessageBox({
-      title: '错误提示',
-      message: errorMessage,
-      type: 'error',
-      showCancelButton: false,
-      confirmButtonText: '知道了',
-    }).catch(() => { });
-  }
+    // 这里使用你项目中的 UI 组件库来显示错误，例如 Element Plus
+    if (config?.errorMessageMode === 'message') {
+      // 如果没有错误信息，则会根据状态码进行提示
+      ElMessage({
+        message: errorMessage,
+        type: 'error',
+        plain: true,
+        grouping: true,
+      });
+    } else if (config?.errorMessageMode === 'modal') {
+      ElMessageBox({
+        title: '错误提示',
+        message: errorMessage,
+        type: 'error',
+        showCancelButton: false,
+        confirmButtonText: '知道了',
+      }).catch(() => { });
+    }
+  },
+  defaultLanguage: 'zh',
 });
 ```
 
@@ -249,9 +255,140 @@ async function getUserInfo() {
     });
     console.log(userInfo); // { id: 1, name: 'Alice' }
   } catch (error) {
-    // 错误会被 error-message-interceptor 捕获并提示，你无需手动处理
     console.error('获取用户信息失败');
   }
+}
+```
+
+## 快速上手方式二
+
+**工厂模式，一个函数搞定所有拦截器。根据你的需要开启**
+
+`createRequestClient` 将常用拦截器打包成可配置的工厂，开箱即可获得下载超时扩展、请求体规范化、响应结构转换、认证重试和错误提示等能力，同时又允许你按需拓展，让接入体验与定制能力兼得。
+
+```ts
+import type { AxiosError, AxiosResponse } from 'axios';
+import { createRequestClient } from 'axios-easy/create-request-client';
+
+/** 假设你的接口返回数据结构如下 */
+type ApiResponse<T> = {
+  resultCode: 'SUCCESS' | 'FAIL';
+  data: T;
+  errorCode?: string;
+  errorCodeDes?: string;
+};
+
+/** 和后端约定好的登录失效错误码 */
+const AUTH_ERROR_CODES = [
+  'KICK_OUT',
+  'LOGIN_REPLACE',
+  'NOT_TOKEN',
+  'TOKEN_DEFAULT_ERROR',
+  'TOKEN_TIMEOUT',
+];
+
+const { axiosInstance, request, setGlobalLanguage } = createRequestClient({
+  axiosConfig: {
+    baseURL: 'https://api.example.com',
+    responseReturn: 'body',
+    errorMessageMode: 'message',
+    timeout: 30 * 1000,
+  },
+  // 使用 qs 库对请求参数进行序列化，这个一般不需要使用，用于发送 application/x-www-form-urlencoded 格式的数据。
+  paramsSerializer: false,
+  /** 是否启用默认请求拦截器。true 表示使用默认配置（下载延长超时 & 请求体规范化-去除字符串首尾空白开启） */
+  defaultRequest: true,
+  defaultResponse: {
+    codeField: 'resultCode',
+    dataField: 'data',
+    successCode: 'SUCCESS',
+    isThrowWhenFail: true,
+  },
+  authenticate: (instance) => ({
+    isAuthenticateFailed: (error) => {
+      const errorCode = error.response?.data?.errorCode;
+      return error.response?.status === 401 || (errorCode ? AUTH_ERROR_CODES.includes(errorCode) : false);
+    },
+    doReAuthenticate: async (_error: AxiosError<ApiResponse<any>>) => {
+      window.location.href = '/login';
+    },
+    enableRefreshToken: true,
+    doRefreshToken: async () => {
+      const res = await instance.post('/refresh-token', {
+        refreshToken: localStorage.getItem('refresh_token'),
+      });
+      const { token, refreshToken } = res.data;
+      localStorage.setItem('access_token', token);
+      localStorage.setItem('refresh_token', refreshToken);
+    },
+  }),
+  errorMessage: {
+    handler: (errorResponse: AxiosResponse<ApiResponse<any>>, networkErrMsg) => {
+      if (!errorResponse.config || !errorResponse.data) {
+        return;
+      }
+
+      if (errorResponse.config.errorMessageMode === 'none') {
+        return;
+      }
+
+      const errorMessage = errorResponse.data?.errorCodeDes || networkErrMsg || errorResponse.data?.errorCode || '未知错误';
+
+      if (errorResponse.config.errorMessageMode === 'message') {
+        ElMessage({
+          message: errorMessage,
+          type: 'error',
+          plain: true,
+          grouping: true,
+        });
+      } else if (errorResponse.config.errorMessageMode === 'modal') {
+        ElMessageBox({
+          title: '错误提示',
+          message: errorMessage,
+          type: 'error',
+          showCancelButton: false,
+          confirmButtonText: '知道了',
+        }).catch(() => {});
+      }
+    },
+    defaultLanguage: 'zh',
+  },
+  setup: (client) => {
+    // 这里可以继续挂载第三方插件，例如 axios-retry
+    // axiosRetry(client, { retries: 3 });
+
+    client.interceptors.request.use((config) => {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    });
+  },
+});
+
+// 可选：设置全局错误提示语言
+// setGlobalLanguage('en');
+```
+
+```ts
+// 现在，你可以使用配置好的 axiosInstance 发起请求了
+async function getUserInfo() {
+  try {
+    const userInfo = await axiosInstance.get<ApiResponse<{ id: number; name: string }>>('/user/info', {
+      errorMessageMode: 'modal',
+    });
+    console.log(userInfo); // { id: 1, name: 'Alice' }
+  } catch (error) {
+    console.error('获取用户信息失败');
+  }
+}
+
+async function getPetInfo() {
+  const petInfo = await request('/api/pet/1', {
+    errorMessageMode: 'modal',
+  });
+  console.log(petInfo); // { id: 1, name: 'Alice' }
 }
 ```
 
@@ -268,6 +405,8 @@ async function getUserInfo() {
 **配置选项 (`DefaultRequestInterceptorOptions`)**:
 
 ```ts
+import type { InternalAxiosRequestConfig } from 'axios';
+
 export type DefaultRequestInterceptorOptions = {
   /**
    * 当请求是下载文件时（`responseType` 为 `'blob'` 或 `'arraybuffer'`），
@@ -340,6 +479,67 @@ axiosInstance.post('/api/users',
 // 实际发送的数据为: { name: 'Alice', email: null }
 ```
 
+### `axios-easy/createRequestClient` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/createRequestClient.ts)
+
+`createRequestClient` 将常见拦截器组合为一体化工厂：默认开启下载延时和数据规范化，可选启用响应解析、认证刷新、错误提示、参数序列化与 token 注入，并提供 `setup` 钩子扩展自定义逻辑。
+
+**类型定义 (`CreateRequestClientOptions`)**：
+
+```ts
+import type { AxiosInstance, CreateAxiosDefaults } from 'axios';
+import type { AuthenticateInterceptorOptions } from 'axios-easy/authenticate-interceptor';
+import type { DefaultRequestInterceptorOptions } from 'axios-easy/default-request-interceptor';
+import type { DefaultResponseInterceptorOptions } from 'axios-easy/default-response-interceptor';
+import type { HandleErrorMessage, SupportedLanguage } from 'axios-easy/error-message-interceptor';
+import type { ParamsSerializerInterceptorOptions } from 'axios-easy/params-serializer-interceptor';
+
+type ErrorMessageOptions = {
+  handler: HandleErrorMessage;
+  defaultLanguage?: SupportedLanguage;
+};
+
+type CreateRequestClientOptions = {
+  axiosConfig?: CreateAxiosDefaults;
+  defaultRequest?: boolean | DefaultRequestInterceptorOptions;
+  defaultResponse?: false | DefaultResponseInterceptorOptions;
+  authenticate?: false | ((client: AxiosInstance) => AuthenticateInterceptorOptions);
+  errorMessage?: false | ErrorMessageOptions;
+  paramsSerializer?: boolean | ParamsSerializerInterceptorOptions;
+  setup?: (client: AxiosInstance) => void;
+};
+```
+
+**使用**：
+
+```ts
+import { createRequestClient } from 'axios-easy';
+
+const client = createRequestClient({
+  defaultRequest: true,
+  defaultResponse: {
+    codeField: 'code',
+    dataField: 'data',
+    successCode: 0,
+  },
+  authenticate: (instance) => ({
+    enableRefreshToken: false,
+    doReAuthenticate: async () => {
+      window.location.href = '/login';
+    },
+  }),
+  setup: (instance) => {
+    instance.interceptors.request.use((config) => {
+      console.log('[debug] request url:', config.url);
+      return config;
+    });
+  },
+});
+
+const data = await client.get('/api/example');
+```
+
+> 将配置设为 `false` 可以彻底关闭对应模块；保持 `true` 使用默认行为；传入对象或工厂函数则进入细粒度自定义，使默认体验与灵活拓展兼容。
+
 ---
 
 ### `axios-easy/default-response-interceptor` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/default-response-interceptor/index.ts)
@@ -376,7 +576,7 @@ export type DefaultResponseInterceptorOptions = {
   successCode: ((code: any) => boolean) | number | string;
   /**
    * 当业务请求失败时（状态码不匹配 `successCode`），是否抛出错误。
-   * 设置为 `true` 后，业务错误将进入 `catch` 块，可由错误拦截器统一处理。
+   * 设置为 `true` 后，业务错误将进入 `catch` 块。
    * @default true
    */
   isThrowWhenFail?: boolean;
@@ -410,7 +610,7 @@ interface AxiosRequestConfig {
       ...
     }
     * ```
-    */
+  */
   responseReturn?: 'body' | 'data' | 'raw';
 }
 ```
@@ -505,14 +705,15 @@ export function isServerError(error: any): error is ServerError {
 - **国际化支持**: 支持中英文错误信息，提供全局语言管理和请求级别语言设置。
 - **自定义处理**: 你需要提供一个处理函数，来自定义如何显示错误信息（例如使用 `Message` 或 `Modal` 组件）。
 
-**回调函数类型 (`HandleErrorMessage`)**:
+**配置选项 (`ErrorMessageInterceptorOptions`)**:
 
 ```ts
-/**
- * @param error Axios 响应对象，其中包含了完整的错误信息。
- * @param networkErrMsg networkErrMsg 是拦截器生成的标准化错误信息 在服务器返回4xx或5xx状态码，无法连接到服务器或CORS错误，请求超时的情况(axios 内部错误)，才有预置的错误信息。
- */
-export type HandleErrorMessage = (error: AxiosResponse<any, any>, networkErrMsg: string) => void;
+export type ErrorMessageInterceptorOptions = {
+  /** 自定义错误提示处理函数 */
+  handler: HandleErrorMessage;
+  /** 默认语言，默认为中文。如果不提供，将使用全局语言设置 */
+  defaultLanguage?: SupportedLanguage;
+}
 ```
 
 **类型扩展**:
@@ -544,19 +745,21 @@ interface AxiosRequestConfig {
 ```ts
 import { createErrorMessageInterceptor } from 'axios-easy/error-message-interceptor';
 
-createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-  // 优先使用后端返回的错误描述
-  const errorMessage = error.data?.errorCodeDes || networkErrMsg || '未知错误';
+createErrorMessageInterceptor(axiosInstance, {
+  handler: (error, networkErrMsg) => {
+    // 优先使用后端返回的错误描述
+    const errorMessage = error.data?.errorCodeDes || networkErrMsg || '未知错误';
 
-  // 使用你项目的 UI 库进行提示
-  // ElMessage.error(errorMessage);
-  console.error(errorMessage);
+    // 使用你项目的 UI 库进行提示
+    // ElMessage.error(errorMessage);
+    console.error(errorMessage);
 
-  // 你还可以根据请求配置的 errorMessageMode 来决定提示方式
-  if (error.config?.errorMessageMode === 'modal') {
-    // ElMessageBox.alert(errorMessage, '错误');
-  } else {
-    // ...其他处理
+    // 你还可以根据请求配置的 errorMessageMode 来决定提示方式
+    if (error.config?.errorMessageMode === 'modal') {
+      // ElMessageBox.alert(errorMessage, '错误');
+    } else {
+      // ...其他处理
+    }
   }
 });
 ```
@@ -567,8 +770,10 @@ import { createErrorMessageInterceptor, setGlobalLanguage } from 'axios-easy/err
 
 // 1. 设置全局语言（推荐方式）
 setGlobalLanguage('en'); // 设置为英文
-createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-  console.error(networkErrMsg); // 自动显示英文错误信息
+createErrorMessageInterceptor(axiosInstance, {
+  handler: (error, networkErrMsg) => {
+    console.error(networkErrMsg); // 自动显示英文错误信息
+  }
 });
 
 // 2. 单个请求设置语言

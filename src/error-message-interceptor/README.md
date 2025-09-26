@@ -20,11 +20,13 @@ const axiosInstance = axios.create();
 // 创建错误信息拦截器（默认中文）
 const interceptorId = createErrorMessageInterceptor(
   axiosInstance,
-  (error, errorMessage) => {
-    console.error('错误信息:', errorMessage);
-    // 这里可以调用你的 UI 组件显示错误，如：
-    // message.error(errorMessage); // Element Plus
-    // notification.error({ message: errorMessage }); // Ant Design
+  {
+    handler:   (error, errorMessage) => {
+      console.error('错误信息:', errorMessage);
+      // 这里可以调用你的 UI 组件显示错误，如：
+      // message.error(errorMessage); // Element Plus
+      // notification.error({ message: errorMessage }); // Ant Design
+    }
   }
 );
 ```
@@ -42,8 +44,10 @@ setGlobalLanguage('en');
 // 创建拦截器时不需要指定语言，会自动使用全局设置
 const interceptorId = createErrorMessageInterceptor(
   axiosInstance,
-  (error, errorMessage) => {
-    console.error('Error:', errorMessage);
+  {
+    handler: (error, errorMessage) => {
+      console.error('Error:', errorMessage);
+    }
   }
 );
 
@@ -58,10 +62,12 @@ console.log(getGlobalLanguage()); // 输出: 'zh'
 // 设置默认为英文（优先于全局语言设置）
 const interceptorId = createErrorMessageInterceptor(
   axiosInstance,
-  (error, errorMessage) => {
-    console.error('Error:', errorMessage);
+  {
+    handler: (error, errorMessage) => {
+      console.error('Error:', errorMessage);
+    },
+    defaultLanguage: 'en'
   },
-  'en' // 拦截器默认语言为英文
 );
 ```
 
@@ -92,10 +98,12 @@ setGlobalLanguage('zh'); // 全局设置为中文
 
 const interceptorId = createErrorMessageInterceptor(
   axiosInstance,
-  (error, errorMessage) => {
-    console.error(errorMessage);
-  },
-  'en' // 拦截器默认为英文，优先于全局设置
+  {
+    handler: (error, errorMessage) => {
+      console.error(errorMessage);
+    },
+    defaultLanguage: 'en'
+  }
 );
 
 try {
@@ -118,8 +126,10 @@ setGlobalLanguage(userLanguage as 'zh' | 'en');
 // 创建拦截器，自动使用全局语言设置
 const interceptorId = createErrorMessageInterceptor(
   axiosInstance,
-  (error, errorMessage) => {
-    message.error(errorMessage);
+  {
+    handler: (error, errorMessage) => {
+      message.error(errorMessage);
+    }
   }
 );
 
@@ -163,10 +173,12 @@ import { ElMessage } from 'element-plus';
 
 const interceptorId = createErrorMessageInterceptor(
   axiosInstance,
-  (error, errorMessage) => {
-    ElMessage.error(errorMessage);
-  },
-  'zh'
+  {
+    handler: (error, errorMessage) => {
+      ElMessage.error(errorMessage);
+    },
+    defaultLanguage: 'zh'
+  }
 );
 
 // Ant Design 集成
@@ -174,31 +186,14 @@ import { message } from 'antd';
 
 const interceptorId = createErrorMessageInterceptor(
   axiosInstance,
-  (error, errorMessage) => {
-    message.error(errorMessage);
-  },
-  'en'
-);
-```
-
-### 错误分类处理
-
-```typescript
-const interceptorId = createErrorMessageInterceptor(
-  axiosInstance,
-  (error, errorMessage) => {
-    if (error.response?.status === 401) {
-      // 处理认证错误，跳转到登录页
-      router.push('/login');
-    } else if (error.response?.status >= 500) {
-      // 服务器错误，显示通用错误信息
-      showErrorModal(errorMessage);
-    } else {
-      // 其他错误，显示具体错误信息
-      showErrorToast(errorMessage);
-    }
+  {
+    handler: (error, errorMessage) => {
+      message.error(errorMessage);
+    },
+    defaultLanguage: 'en'
   }
 );
+
 ```
 
 ## API 参考
@@ -208,16 +203,17 @@ const interceptorId = createErrorMessageInterceptor(
 ```typescript
 function createErrorMessageInterceptor(
   axiosInstance: AxiosInstance,
-  handleErrorMessage: HandleErrorMessage,
-  defaultLanguage?: SupportedLanguage
+  options:{
+    handler: HandleErrorMessage,
+    defaultLanguage?: SupportedLanguage
+  }
 ): number
 ```
 
 **参数**：
 
 - `axiosInstance`: Axios 实例
-- `handleErrorMessage`: 错误处理函数
-- `defaultLanguage`: 拦截器默认语言，可选。如果不提供，将使用全局语言设置
+- `options`: 配置选项
 
 **返回值**：
 
@@ -276,32 +272,7 @@ type SupportedLanguage = 'zh' | 'en';
 axiosInstance.interceptors.response.eject(interceptorId);
 ```
 
-## 向后兼容性
-
-现有的代码无需任何修改即可继续使用，所有新功能都是可选的：
-
-```typescript
-// 现有代码保持不变
-const interceptorId = createErrorMessageInterceptor(
-  axiosInstance,
-  (error, errorMessage) => {
-    message.error(errorMessage); // 默认显示中文错误信息
-  }
-);
-```
-
 ## 最佳实践
-
-### 1. 推荐使用全局语言设置
-
-```typescript
-// ✅ 推荐：使用全局语言设置
-setGlobalLanguage('en');
-const interceptorId = createErrorMessageInterceptor(axiosInstance, handleError);
-
-// ❌ 不推荐：每个拦截器都指定语言
-const interceptorId = createErrorMessageInterceptor(axiosInstance, handleError, 'en');
-```
 
 ### 2. 应用初始化时设置语言
 
@@ -312,7 +283,9 @@ function initializeApp() {
   setGlobalLanguage(savedLanguage as 'zh' | 'en');
 
   // 创建 axios 拦截器
-  createErrorMessageInterceptor(axiosInstance, handleError);
+  createErrorMessageInterceptor(axiosInstance, {
+    handler: handleError
+  });
 }
 ```
 
