@@ -61,6 +61,11 @@
       "types": "./dist/extend-axios-type.d.ts",
       "import": "./dist/extend-axios-type.js",
       "require": "./dist/extend-axios-type.js"
+    },
+    "./create-request-client": {
+      "types": "./dist/create-request-client/index.d.ts",
+      "import": "./dist/create-request-client.js",
+      "require": "./dist/create-request-client.js"
     }
   },
   "publishConfig": {
