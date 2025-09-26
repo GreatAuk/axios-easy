@@ -38,7 +38,7 @@ describe('defaultRequestInterceptor', () => {
       const config = { timeout: 1000, responseType: 'arraybuffer' };
       const newConfig = handler(config);
 
-      expect(timeoutCalculator).toHaveBeenCalledWith(1000);
+      expect(timeoutCalculator).toHaveBeenCalledWith(1000, expect.objectContaining({ timeout: 6000 }));
       expect(newConfig.timeout).toBe(6000);
     });
 

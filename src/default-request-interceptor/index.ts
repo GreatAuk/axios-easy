@@ -1,5 +1,5 @@
 import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
-import { normalizeRequestPayload, } from '../utils';
+import { normalizeRequestPayload } from '../utils';
 import { isFunction } from '../util';
 
 import type { NormalizeRequestPayloadOptions } from '../utils/normalizeRequestPayload';

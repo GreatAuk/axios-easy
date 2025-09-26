@@ -9,6 +9,13 @@ export type { SupportedLanguage };
 export type ErrorMessageMode = 'message' | 'modal' | 'none';
 export { httpMessageMaps, httpMessageMapZH, setGlobalLanguage, getGlobalLanguage } from './locale';
 
+export type ErrorMessageInterceptorOptions = {
+  /** 自定义错误提示处理函数 */
+  handler: HandleErrorMessage;
+  /** 默认语言，默认为中文。如果不提供，将使用全局语言设置 */
+  defaultLanguage?: SupportedLanguage;
+}
+
 declare module 'axios' {
   export interface AxiosRequestConfig {
     /**
@@ -45,8 +52,10 @@ export type HandleErrorMessage = (error: AxiosResponse, networkErrMsg: string) =
  */
 export function createErrorMessageInterceptor(
   axiosInstance: AxiosInstance,
-  handleErrorMessage: HandleErrorMessage,
-  defaultLanguage: SupportedLanguage = 'zh'
+  {
+    handler,
+    defaultLanguage = 'zh'
+  }: ErrorMessageInterceptorOptions
 ): number {
   const responseInterceptorId = axiosInstance.interceptors.response.use(
     null,
@@ -87,7 +96,7 @@ export function createErrorMessageInterceptor(
         }
       }
 
-      handleErrorMessage?.(error, networkErrMsg);
+      handler?.(error, networkErrMsg);
       return Promise.reject(error);
     });
 

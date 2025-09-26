@@ -26,9 +26,11 @@ describe('errorMessageResponseInterceptor', () => {
       let capturedMsg = '';
       let capturedError: any = null;
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
-        capturedError = error;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+          capturedError = error;
+        }
       })
 
       mock.onGet('/api/pet/1').networkErrorOnce();
@@ -44,9 +46,11 @@ describe('errorMessageResponseInterceptor', () => {
       let capturedMsg = '';
       let capturedError: any = null;
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
-        capturedError = error;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+          capturedError = error;
+        }
       })
 
       mock.onGet('/api/pet/1').timeoutOnce();
@@ -59,8 +63,10 @@ describe('errorMessageResponseInterceptor', () => {
     it('应该处理连接中断超时', async () => {
       let capturedMsg = '';
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       })
 
       // 模拟 ECONNABORTED 错误
@@ -82,8 +88,10 @@ describe('errorMessageResponseInterceptor', () => {
     it('应该处理400错误 - 请求错误', async () => {
       let capturedMsg = '';
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       })
 
       mock.onGet('/api/pet/1').reply(400, { message: 'Bad Request' });
@@ -95,8 +103,10 @@ describe('errorMessageResponseInterceptor', () => {
     it('应该处理401错误 - 未授权', async () => {
       let capturedMsg = '';
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       })
 
       mock.onGet('/api/pet/1').reply(401, { message: 'Unauthorized' });
@@ -108,8 +118,10 @@ describe('errorMessageResponseInterceptor', () => {
     it('应该处理403错误 - 禁止访问', async () => {
       let capturedMsg = '';
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       })
 
       mock.onGet('/api/pet/1').reply(403, { message: 'Forbidden' });
@@ -121,8 +133,10 @@ describe('errorMessageResponseInterceptor', () => {
     it('应该处理404错误 - 未找到', async () => {
       let capturedMsg = '';
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       })
 
       mock.onGet('/api/pet/1').reply(404, { message: 'Not Found' });
@@ -134,8 +148,10 @@ describe('errorMessageResponseInterceptor', () => {
     it('应该处理408错误 - 请求超时', async () => {
       let capturedMsg = '';
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       })
 
       mock.onGet('/api/pet/1').reply(408, { message: 'Request Timeout' });
@@ -147,8 +163,10 @@ describe('errorMessageResponseInterceptor', () => {
     it('应该处理500错误 - 内部服务器错误', async () => {
       let capturedMsg = '';
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       })
 
       mock.onGet('/api/pet/1').reply(500, { message: 'Internal Server Error' });
@@ -160,8 +178,10 @@ describe('errorMessageResponseInterceptor', () => {
     it('应该处理未映射的状态码', async () => {
       let capturedMsg = '';
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       })
 
       mock.onGet('/api/pet/1').reply(502, { message: 'Bad Gateway' });
@@ -176,8 +196,10 @@ describe('errorMessageResponseInterceptor', () => {
       let capturedMsg = '';
       let interceptorCalled = false;
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       })
 
       const controller = new AbortController();
@@ -198,7 +220,9 @@ describe('errorMessageResponseInterceptor', () => {
 
   describe('边界情况', () => {
     it('应该返回拦截器ID', () => {
-      interceptorId = createErrorMessageInterceptor(axiosInstance, () => { });
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: () => { }
+      });
 
       expect(typeof interceptorId).toBe('number');
       expect(interceptorId).toBeGreaterThanOrEqual(0);
@@ -206,7 +230,9 @@ describe('errorMessageResponseInterceptor', () => {
 
     it('应该处理没有错误处理函数的情况', async () => {
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, null as any)
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: null as any
+      })
 
       mock.onGet('/api/pet/1').networkErrorOnce();
 
@@ -218,9 +244,11 @@ describe('errorMessageResponseInterceptor', () => {
       let capturedMsg = '';
       let capturedError: any = null;
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
-        capturedError = error;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+          capturedError = error;
+        }
       })
 
       // 模拟非axios错误
@@ -237,8 +265,10 @@ describe('errorMessageResponseInterceptor', () => {
     it('应该处理包含timeout关键字的错误消息', async () => {
       let capturedMsg = '';
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       })
 
       // 模拟包含timeout关键字的错误
@@ -258,8 +288,10 @@ describe('errorMessageResponseInterceptor', () => {
     it('应该处理包含Network Error关键字的错误消息', async () => {
       let capturedMsg = '';
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       })
 
       // 模拟包含Network Error关键字的错误
@@ -282,9 +314,11 @@ describe('errorMessageResponseInterceptor', () => {
       let capturedMsg = '';
       let capturedError: any = null;
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
-        capturedError = error;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+          capturedError = error;
+        }
       })
 
       mock.onGet('/api/pet/1').reply(404, { message: 'Not Found' });
@@ -299,7 +333,9 @@ describe('errorMessageResponseInterceptor', () => {
     it('应该在所有错误情况下都调用错误处理函数', async () => {
       const mockHandler = vi.fn();
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, mockHandler)
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: mockHandler
+      })
 
       mock.onGet('/api/pet/1').networkErrorOnce();
 
@@ -317,8 +353,10 @@ describe('errorMessageResponseInterceptor', () => {
     it('应该支持默认中文错误信息', async () => {
       let capturedMsg = '';
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       })
 
       mock.onGet('/api/pet/1').reply(400, { message: 'Bad Request' });
@@ -330,9 +368,12 @@ describe('errorMessageResponseInterceptor', () => {
     it('应该支持通过默认语言参数设置英文', async () => {
       let capturedMsg = '';
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
-      }, 'en')
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        },
+        defaultLanguage: 'en'
+      })
 
       mock.onGet('/api/pet/1').reply(400, { message: 'Bad Request' });
 
@@ -343,8 +384,10 @@ describe('errorMessageResponseInterceptor', () => {
     it('应该支持通过请求配置设置语言', async () => {
       let capturedMsg = '';
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       })
 
       mock.onGet('/api/pet/1').reply(401, { message: 'Unauthorized' });
@@ -360,9 +403,12 @@ describe('errorMessageResponseInterceptor', () => {
       let capturedMsg = '';
 
       // 默认设置为英文
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
-      }, 'en')
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        },
+        defaultLanguage: 'en'
+      })
 
       mock.onGet('/api/pet/1').reply(403, { message: 'Forbidden' });
 
@@ -377,9 +423,12 @@ describe('errorMessageResponseInterceptor', () => {
     it('应该正确处理网络错误的多语言', async () => {
       let capturedMsg = '';
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
-      }, 'en')
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        },
+        defaultLanguage: 'en'
+      })
 
       mock.onGet('/api/pet/1').networkErrorOnce();
 
@@ -390,9 +439,12 @@ describe('errorMessageResponseInterceptor', () => {
     it('应该正确处理超时错误的多语言', async () => {
       let capturedMsg = '';
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
-      }, 'en')
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        },
+        defaultLanguage: 'en'
+      })
 
       mock.onGet('/api/pet/1').timeoutOnce();
 
@@ -410,9 +462,12 @@ describe('errorMessageResponseInterceptor', () => {
 
         // 测试中文
         let capturedMsgZh = '';
-        interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-          capturedMsgZh = networkErrMsg;
-        }, 'zh');
+        interceptorId = createErrorMessageInterceptor(axiosInstance, {
+          handler: (error, networkErrMsg) => {
+            capturedMsgZh = networkErrMsg;
+          },
+          defaultLanguage: 'zh'
+        });
 
         mock.onGet(`/api/test/${statusCode}`).reply(statusCode, { message: 'Error' });
 
@@ -424,9 +479,12 @@ describe('errorMessageResponseInterceptor', () => {
 
         // 测试英文
         let capturedMsgEn = '';
-        interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-          capturedMsgEn = networkErrMsg;
-        }, 'en');
+        interceptorId = createErrorMessageInterceptor(axiosInstance, {
+          handler: (error, networkErrMsg) => {
+            capturedMsgEn = networkErrMsg;
+          },
+          defaultLanguage: 'en'
+        });
 
         mock.onGet(`/api/test-en/${statusCode}`).reply(statusCode, { message: 'Error' });
 
@@ -442,8 +500,10 @@ describe('errorMessageResponseInterceptor', () => {
     it('应该处理无效语言类型时回退到默认语言', async () => {
       let capturedMsg = '';
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       })
 
       mock.onGet('/api/pet/1').reply(404, { message: 'Not Found' });
@@ -480,8 +540,10 @@ describe('errorMessageResponseInterceptor', () => {
       setGlobalLanguage('en');
 
       // 创建拦截器时不指定默认语言，应该使用全局语言
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       });
 
       mock.onGet('/api/pet/1').reply(400, { message: 'Bad Request' });
@@ -497,9 +559,12 @@ describe('errorMessageResponseInterceptor', () => {
       setGlobalLanguage('en');
 
       // 创建拦截器时指定默认语言为中文，应该优先使用中文
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
-      }, 'zh');
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        },
+        defaultLanguage: 'zh'
+      });
 
       mock.onGet('/api/pet/1').reply(401, { message: 'Unauthorized' });
 
@@ -514,9 +579,12 @@ describe('errorMessageResponseInterceptor', () => {
       setGlobalLanguage('zh');
 
       // 创建拦截器时指定默认语言为英文
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
-      }, 'en');
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        },
+        defaultLanguage: 'en'
+      });
 
       mock.onGet('/api/pet/1').reply(403, { message: 'Forbidden' });
 
@@ -534,8 +602,10 @@ describe('errorMessageResponseInterceptor', () => {
       // 初始设置为中文
       setGlobalLanguage('zh');
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       });
 
       // 第一次请求使用中文
@@ -557,14 +627,18 @@ describe('errorMessageResponseInterceptor', () => {
       let capturedMsg2 = '';
 
       // 创建两个拦截器，都不指定默认语言
-      const interceptorId1 = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg1 = networkErrMsg;
+      const interceptorId1 = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg1 = networkErrMsg;
+        }
       });
 
       const axiosInstance2 = axios.create();
       const mock2 = new MockAdapter(axiosInstance2);
-      const interceptorId2 = createErrorMessageInterceptor(axiosInstance2, (error, networkErrMsg) => {
-        capturedMsg2 = networkErrMsg;
+      const interceptorId2 = createErrorMessageInterceptor(axiosInstance2, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg2 = networkErrMsg;
+        }
       });
 
       // 设置全局语言为英文
@@ -593,8 +667,10 @@ describe('errorMessageResponseInterceptor', () => {
       // 设置全局语言为英文
       setGlobalLanguage('en');
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       });
 
       mock.onGet('/api/pet/1').networkErrorOnce();
@@ -609,8 +685,10 @@ describe('errorMessageResponseInterceptor', () => {
       // 设置全局语言为英文
       setGlobalLanguage('en');
 
-      interceptorId = createErrorMessageInterceptor(axiosInstance, (error, networkErrMsg) => {
-        capturedMsg = networkErrMsg;
+      interceptorId = createErrorMessageInterceptor(axiosInstance, {
+        handler: (error, networkErrMsg) => {
+          capturedMsg = networkErrMsg;
+        }
       });
 
       mock.onGet('/api/pet/1').timeoutOnce();
