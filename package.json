@@ -72,15 +72,14 @@
     "access": "public"
   },
   "scripts": {
-    "build": "stale-dep && tsdown",
-    "dev": "stale-dep && tsdown --watch",
-    "test": "stale-dep && vitest",
-    "test:once": "stale-dep && vitest run",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest",
+    "test:once": "vitest run",
     "coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "release": "bumpp",
-    "lint": "oxlint --fix",
-    "postinstall": "stale-dep -u"
+    "lint": "oxlint --fix"
   },
   "devDependencies": {
     "@types/file-saver": "^2.0.7",
@@ -90,7 +89,6 @@
     "axios-mock-adapter": "^2.1.0",
     "bumpp": "^10.1.0",
     "oxlint": "^1.12.0",
-    "stale-dep": "^0.8.3",
     "tsdown": "^0.11.9",
     "typescript": "^5.8.3",
     "vitest": "^3.1.3"
