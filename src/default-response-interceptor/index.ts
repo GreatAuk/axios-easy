@@ -105,7 +105,8 @@ export const createDefaultResponseInterceptor = (axiosInstance: AxiosInstance, {
         : codeValue === successCode;
 
       if (!isSuccess && isThrowWhenFail) {
-        return Promise.reject(response)
+        // throw 一个类似 AxiosError 的错误对象
+        return Promise.reject(Object.assign({}, response, { response }))
       }
 
       // 返回完整响应体

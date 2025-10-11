@@ -194,9 +194,94 @@ describe('defaultResponseInterceptor', () => {
 
       mock.onGet('/api/pet/999').reply(200, mockResponse);
 
-      await expect(axiosInstance.get('/api/pet/999')).rejects.toMatchObject({
-        data: mockResponse
-      });
+      await expect(axiosInstance.get('/api/pet/999')).rejects.toMatchInlineSnapshot(`
+        {
+          "config": {
+            "allowAbsoluteUrls": true,
+            "data": undefined,
+            "env": {
+              "Blob": [Function],
+              "FormData": [Function],
+            },
+            "headers": {
+              "Accept": "application/json, text/plain, */*",
+            },
+            "maxBodyLength": -1,
+            "maxContentLength": -1,
+            "method": "get",
+            "responseReturn": "body",
+            "timeout": 0,
+            "transformRequest": [
+              [Function],
+            ],
+            "transformResponse": [
+              [Function],
+            ],
+            "transitional": {
+              "clarifyTimeoutError": false,
+              "forcedJSONParsing": true,
+              "silentJSONParsing": true,
+            },
+            "url": "/api/pet/999",
+            "validateStatus": [Function],
+            "xsrfCookieName": "XSRF-TOKEN",
+            "xsrfHeaderName": "X-XSRF-TOKEN",
+          },
+          "data": {
+            "errorCode": "PET_NOT_FOUND",
+            "errorCodeDes": "Pet not found",
+            "resultCode": "FAIL",
+          },
+          "headers": {},
+          "request": {
+            "responseURL": "/api/pet/999",
+          },
+          "response": {
+            "config": {
+              "allowAbsoluteUrls": true,
+              "data": undefined,
+              "env": {
+                "Blob": [Function],
+                "FormData": [Function],
+              },
+              "headers": {
+                "Accept": "application/json, text/plain, */*",
+              },
+              "maxBodyLength": -1,
+              "maxContentLength": -1,
+              "method": "get",
+              "responseReturn": "body",
+              "timeout": 0,
+              "transformRequest": [
+                [Function],
+              ],
+              "transformResponse": [
+                [Function],
+              ],
+              "transitional": {
+                "clarifyTimeoutError": false,
+                "forcedJSONParsing": true,
+                "silentJSONParsing": true,
+              },
+              "url": "/api/pet/999",
+              "validateStatus": [Function],
+              "xsrfCookieName": "XSRF-TOKEN",
+              "xsrfHeaderName": "X-XSRF-TOKEN",
+            },
+            "data": {
+              "errorCode": "PET_NOT_FOUND",
+              "errorCodeDes": "Pet not found",
+              "resultCode": "FAIL",
+            },
+            "headers": {},
+            "request": {
+              "responseURL": "/api/pet/999",
+            },
+            "status": 200,
+          },
+          "status": 200,
+        }
+      `)
     });
 
     it('接口失败且 isThrowWhenFail: false - 不应该抛出错误', async () => {
