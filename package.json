@@ -1,6 +1,6 @@
 {
   "name": "axios-easy",
-  "version": "0.2.3",
+  "version": "0.2.5",
   "description": "A simple axios library",
   "type": "module",
   "license": "MIT",
@@ -78,7 +78,7 @@
     "test:once": "vitest run",
     "coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "release": "bumpp",
+    "release:all": "bumpp --no-push && node script/index.js",
     "lint": "oxlint --fix"
   },
   "devDependencies": {
@@ -89,6 +89,7 @@
     "axios-mock-adapter": "^2.1.0",
     "bumpp": "^10.1.0",
     "oxlint": "^1.12.0",
+    "tinyexec": "^1.0.1",
     "tsdown": "^0.11.9",
     "typescript": "^5.8.3",
     "vitest": "^3.1.3"
