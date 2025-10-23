@@ -39,6 +39,9 @@ importers:
       oxlint:
         specifier: ^1.12.0
         version: 1.12.0
+      tinyexec:
+        specifier: ^1.0.1
+        version: 1.0.1
       tsdown:
         specifier: ^0.11.9
         version: 0.11.13(typescript@5.9.2)

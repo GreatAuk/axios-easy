@@ -47,11 +47,17 @@
 ## 📦 安装
 
 ```bash
-pnpm install axios-easy
+pnpm add axios-easy
 # or
 npm install axios-easy
 # or
 yarn add axios-easy
+```
+
+或从内部镜像安装：
+
+```bash
+pnpm add @sp/axios-easy
 ```
 
 PS: `axios` 版本最好 `1.12.0` 以上，否则 ts 类型会报错。
