@@ -23,13 +23,13 @@
 - [📊 请求流程图](#-请求流程图)
 - [🚀 快速上手](#-快速上手)
 - [📚 API 文档](#-api-文档)
-  - [`axios-easy/createRequestClient`](#axios-easycreaterequestclient-source)
-  - [`axios-easy/default-request-interceptor`](#axios-easydefault-request-interceptor-source)
-  - [`axios-easy/default-response-interceptor`](#axios-easydefault-response-interceptor-source)
-  - [`axios-easy/error-message-interceptor`](#axios-easyerror-message-interceptor-source)
-  - [`axios-easy/authenticate-interceptor`](#axios-easyauthenticate-interceptor-source)
-  - [`axios-easy/params-serializer-interceptor`](#axios-easyparams-serializer-interceptor-source)
-  - [`axios-easy/utils`](#axios-easyutils)
+  - [axios-easy/createRequestClient](#axios-easycreaterequestclient)
+  - [axios-easy/default-request-interceptor](#axios-easydefault-request-interceptor)
+  - [axios-easy/default-response-interceptor](#axios-easydefault-response-interceptor)
+  - [axios-easy/error-message-interceptor](#axios-easyerror-message-interceptor)
+  - [axios-easy/authenticate-interceptor](#axios-easyauthenticate-interceptor)
+  - [axios-easy/params-serializer-interceptor](#axios-easyparams-serializer-interceptor)
+  - [axios-easy/utils](#axios-easyutils)
 - [搭配 openapi-ts-request 使用](#搭配-openapi-ts-request-使用-查看)
 - [🤝 贡献](#-贡献)
 - [📄 许可证](#-许可证)
@@ -99,7 +99,7 @@ graph TD
 **搭积木一样，根据你需要的拦截器按需导入。可定制程度较高，也更符合之前的编程习惯：创建 axios 实例，然后添加各种拦截器。**
 
 下面是一个集成了所有核心拦截器的示例，展示了 `axios-easy` 的使用方法，这是一个比较完整的示例，你简单修改后可以直接使用。
-
+tr
 ```ts
 import type { AxiosError, AxiosResponse } from 'axios';
 import axios from 'axios';
@@ -394,7 +394,9 @@ async function getPetInfo() {
 
 ## 📚 API 文档
 
-### `axios-easy/default-request-interceptor` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/default-request-interceptor/index.ts)
+### axios-easy/default-request-interceptor
+
+[source](https://github.com/GreatAuk/axios-easy/blob/main/src/default-request-interceptor/index.ts)
 
 此拦截器用于优化请求行为。
 
@@ -479,7 +481,9 @@ axiosInstance.post('/api/users',
 // 实际发送的数据为: { name: 'Alice', email: null }
 ```
 
-### `axios-easy/createRequestClient` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/createRequestClient.ts)
+### axios-easy/createRequestClient
+
+[source](https://github.com/GreatAuk/axios-easy/blob/main/src/createRequestClient.ts)
 
 `createRequestClient` 将常见拦截器组合为一体化工厂：默认开启下载延时和数据规范化，可选启用响应解析、认证刷新、错误提示、参数序列化与 token 注入，并提供 `setup` 钩子扩展自定义逻辑。
 
@@ -542,7 +546,9 @@ const data = await client.get('/api/example');
 
 ---
 
-### `axios-easy/default-response-interceptor` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/default-response-interceptor/index.ts)
+### axios-easy/default-response-interceptor
+
+[source](https://github.com/GreatAuk/axios-easy/blob/main/src/default-response-interceptor/index.ts)
 
 此拦截器用于标准化响应数据结构，让你在业务代码中只关心核心数据。
 
@@ -696,7 +702,9 @@ export function isServerError(error: any): error is ServerError {
 ```
 ---
 
-### `axios-easy/error-message-interceptor` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/error-message-interceptor/index.ts)
+### axios-easy/error-message-interceptor
+
+[source](https://github.com/GreatAuk/axios-easy/blob/main/src/error-message-interceptor/index.ts)
 
 此拦截器用于统一捕获和处理所有请求错误，并提供友好的错误提示。
 
@@ -794,7 +802,9 @@ function switchLanguage(newLanguage: 'zh' | 'en') {
 
 ---
 
-### `axios-easy/authenticate-interceptor` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/authenticate-interceptor/index.ts)
+### axios-easy/authenticate-interceptor
+
+[source](https://github.com/GreatAuk/axios-easy/blob/main/src/authenticate-interceptor/index.ts)
 
 这是一个认证处理拦截器，专门用于处理登录状态失效（如 401）和 Token 自动续期。
 
@@ -856,7 +866,9 @@ createAuthenticateInterceptor(axiosInstance, {
 
 ---
 
-### `axios-easy/params-serializer-interceptor` [source](https://github.com/GreatAuk/axios-easy/blob/main/src/params-serializer-interceptor/index.ts)
+### axios-easy/params-serializer-interceptor
+
+[source](https://github.com/GreatAuk/axios-easy/blob/main/src/params-serializer-interceptor/index.ts)
 
 参数序列化请求拦截器，内部使用 [qs](https://github.com/ljharb/qs) 库对请求参数进行序列化，特别适用于需要发送 `application/x-www-form-urlencoded` 格式数据的场景。一般不需要使用。
 
@@ -941,7 +953,7 @@ axiosInstance.interceptors.request.eject(interceptorId);
 
 ---
 
-### `axios-easy/utils`
+### axios-easy/utils
 
 提供一些在网络请求中非常实用的辅助函数。
 
