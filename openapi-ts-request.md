@@ -77,7 +77,8 @@ import type { AxiosRequestConfig } from 'axios';
 ]);
 ```
 
-在 `package.json` 中注册命令
+### 3. 在 `package.json` 中注册命令
+
 ```json
 {
   "scripts": {
@@ -86,7 +87,7 @@ import type { AxiosRequestConfig } from 'axios';
 }
 ```
 
-运行命令
+### 4. 运行命令
 ```bash
 pnpm openapi
 ```
