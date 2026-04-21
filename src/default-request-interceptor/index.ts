@@ -24,7 +24,7 @@ declare module 'axios' {
 export type ExtendTimeoutWhenDownloadOption = boolean | ((defaultTimeout: number, config: InternalAxiosRequestConfig) => number);
 
 export type DefaultRequestInterceptorOptions = {
-  /** 下载文件时，是否延长超时时间 */
+  /** 下载文件时，是否延长超时时间。注意，如果你为下载接口单独设置了 timeout，则不会应用全局延长逻辑 */
   extendTimeoutWhenDownload?: ExtendTimeoutWhenDownloadOption;
   /** 是否在请求前规范化传参 */
   normalizePayload?: NormalizeRequestPayloadOptions;

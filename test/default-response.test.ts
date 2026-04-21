@@ -220,6 +220,7 @@ describe('defaultResponseInterceptor', () => {
             "transitional": {
               "clarifyTimeoutError": false,
               "forcedJSONParsing": true,
+              "legacyInterceptorReqResOrdering": true,
               "silentJSONParsing": true,
             },
             "url": "/api/pet/999",
@@ -261,6 +262,7 @@ describe('defaultResponseInterceptor', () => {
               "transitional": {
                 "clarifyTimeoutError": false,
                 "forcedJSONParsing": true,
+                "legacyInterceptorReqResOrdering": true,
                 "silentJSONParsing": true,
               },
               "url": "/api/pet/999",

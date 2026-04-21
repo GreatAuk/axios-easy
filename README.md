@@ -426,7 +426,7 @@ import type { InternalAxiosRequestConfig } from 'axios';
 export type DefaultRequestInterceptorOptions = {
   /**
    * 当请求是下载文件时（`responseType` 为 `'blob'` 或 `'arraybuffer'`），
-   * 是否自动延长请求的超时时间，以防止因文件过大导致下载超时。
+   * 是否自动延长请求的超时时间，以防止因文件过大导致下载超时。注意，如果你为下载接口单独设置了 timeout，则不会应用全局延长逻辑
    * @default true
    */
   extendTimeoutWhenDownload?: boolean | ((defaultTimeout: number, config: InternalAxiosRequestConfig) => number);
