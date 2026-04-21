@@ -16,6 +16,14 @@
 
 `axios-easy` 是一个模块化的 `TypeScript` 库，它通过一系列可组合的拦截器和实用程序扩展了 `axios` ，以标准化 `HTTP` 请求/响应处理。该库提供了即插即用的拦截器，用于处理常见的 `Web` 应用程序问题，包括身份验证、错误处理、负载规范化、参数序列化和文件处理。
 
+## Work with AI
+
+安装 skill
+
+```
+npx skills add GreatAuk/axios-easy
+```
+
 ## 目录
 
 - [✨ 特性](#-特性)
